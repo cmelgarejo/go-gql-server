@@ -1,4 +1,4 @@
-# Creating an opinionated Go GQL Server
+# Creating an opinionated Go GQL Server - Part 1
 
 Let's make an opinionated GraphQL server using:
 
@@ -13,9 +13,7 @@ This assumes you have:
 - At least, basic Go knowledge, and have go 1.12+ installed.
 - VSCode (preferred) or similar IDE
 
-## Part 1
-
-### Project Setup
+## Project Setup
 
 We'll follow the Go standard project layout, for this service, take a look at
 the specification, it is opinionated, but serves as a good base, and we might
@@ -32,7 +30,8 @@ $ cd go-gql-server
 Let's create the whole project layout with:
 
 ```bash
-/go-gql-server $ mkdir -p {build,cmd/gql-server,internal/gql-server,pkg,scripts}
+$ mkdir -p {build,cmd/gql-server,internal/gql-server,pkg,scripts}
+# directories are created
 ```
 
 - `internal/gql-server` will hold all the related files for the gql server
@@ -48,9 +47,9 @@ $ go mod init github.com/cmelgarejo/go-gql-server # Replace w/your user handle
 go: creating new go.mod: module github.com/cmelgarejo/go-gql-server
 ```
 
-### Coding our web server
+## Coding our web server
 
-#### 1. Web framework: Gin
+### 1. Web framework: Gin
 
 So, now we can start adding packages to our project! Let's start by getting our
 web framework: `gin-gonic`
@@ -66,13 +65,14 @@ $ go get -u github.com/gin-gonic/gin
 go: creating new go.mod: module cmd/gql-server/main.go
 ```
 
-#### 2. Code the web server
+### 2. Code the web server
 
 So lets start creating the web server, to keep going, create a `main.go` file
 in `cmd/gql-server`
 
 ```bash
-/go-gql-server $ vi cmd/gql-server/main.go
+$ vi cmd/gql-server/main.go
+# vi ensues, I hope you know how to exit
 ```
 
 And paste this placeholder code:
@@ -195,13 +195,14 @@ printf "\nDone building: $app\n\n"
 And before running, make sure you `chmod +x` it
 
 ```bash
-/go-gql-server $ chmod +x scripts/build.sh
+$ chmod +x scripts/build.sh
+# sets execution permission on file
 ```
 
 Now we can start building our server, like so:
 
 ```bash
-/go-gql-server $ .scripts/build.sh
+$ .scripts/build.sh
 
 Building: gql-server
 
@@ -218,7 +219,7 @@ Done building: gql-server
 docker image! Ok, now onto trying out what has been built:
 
 ```bash
-./build/gql-server
+$ ./build/gql-server
 [GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
 
 [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
@@ -335,3 +336,5 @@ own repository and `git push` it :)
 
 This will continue in [Part 2](PART2.md) where we'll add the GQLGen portion of
 the server!
+
+All the code is available [here](https://github.com/cmelgarejo/go-gql-server/tree/tutorial/part-1)
