@@ -353,4 +353,4 @@ this 😅
 
 > If you have a nicer way to arrange this mess, feel free to open an Issue/PR!
 
-As the last part, all the code is available in the [repository here](https://github.com/cmelgarejo/go-gql-server/tree/tutorial/part-1)!
+As the last part, all the code is available in the [repository here](https://github.com/cmelgarejo/go-gql-server/tree/tutorial/part-2)!
