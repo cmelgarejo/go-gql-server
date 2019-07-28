@@ -81,7 +81,7 @@ And paste this placeholder code:
 package main
 
 import (
-    "log"
+    log "github.com/cmelgarejo/go-gql-server/internal/logger"
     "net/http"
 
     "github.com/gin-gonic/gin"
@@ -90,6 +90,7 @@ import (
 func main() {
     host := "localhost"
     port := "7777"
+    pathGQL := "/graphql"
     r := gin.Default()
     // Setup a route
     r.GET("/ping", func(c *gin.Context) {
@@ -132,7 +133,7 @@ func Ping() gin.HandlerFunc {
 package server
 
 import (
-    "log"
+    log "github.com/cmelgarejo/go-gql-server/internal/logger"
 
     "github.com/gin-gonic/gin"
     "github.com/cmelgarejo/go-gql-server/internal/handlers"
@@ -243,7 +244,7 @@ And we can further improve our server code, and make configurations load from a
 package utils
 
 import (
-    "log"
+    log "github.com/cmelgarejo/go-gql-server/internal/logger"
     "os"
     "strconv"
 )
@@ -274,13 +275,13 @@ func MustGetBool(k string) bool {
 The code is pretty much self-explainatory, if a ENV var does not exists, the
 program will panic, we need these to run. Now, changing:
 
-- `cmd/gql-server/main.go` to this:
+- `pkg/server/main.go` to this:
 
 ```go
 package server
 
 import (
-    "log"
+    log "github.com/cmelgarejo/go-gql-server/internal/logger"
 
     "github.com/gin-gonic/gin"
     "github.com/cmelgarejo/go-gql-server/internal/handlers"

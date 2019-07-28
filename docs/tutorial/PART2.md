@@ -1,7 +1,9 @@
 # Creating an opinionated Go GQL Server - Part 2
 
+-[Part 1](PART1.md)
+
 We'll be now add GQLGen's generated server into our project and start `gql`ing
-away! And, we are going to move much faster than the [Part 1](https://medium.com/@cmelgarejo.dev/creating-an-opinionated-gql-server-part1-8fad071e525f)
+away! And, we are going to move much faster than the [Part 1](PART1.md)
 
 ## Adding GQLGen into the project
 
@@ -203,7 +205,7 @@ Now we can modify the `pkg/server/main.go` like this:
 package server
 
 import (
-    "log"
+    log "github.com/cmelgarejo/go-gql-server/internal/logger"
 
     "github.com/cmelgarejo/go-gql-server/internal/handlers"
     "github.com/cmelgarejo/go-gql-server/pkg/utils"
@@ -287,7 +289,7 @@ Start running: gql-server
 [GIN] 2019/07/13 - 23:28:40 | 200 |    1.353992ms |       127.0.0.1 | POST     /graphql
 ```
 
-We can see now GraphQL requests beign redirected to its handler! Nice!
+We can see now GraphQL requests being redirected to its handler! Nice!
 
 Let's navigate to: [http://localhost:7777](http://localhost:7777)
 
@@ -302,16 +304,16 @@ things now, and refactor the code to be a little more ordered.
 
 ## Refactoring code (a.k.a my own personal filename hell)
 
-Like I noted before, I have a contribed, yet effective way to organize
+Like I noted before, I have a contrived, yet effective way to organize
 the code for GQLgen, it will help to keep code organized in small files:
 
-- `r-{entity}.go` where the resolves that are generated with our `gqlgen.sh`
+- `{entity_plural}.go` where the resolves that are generated with our `gqlgen.sh`
   script will have to be copied individually for each `entity`
   (users, posts, comments, you name it)
-- `t-{entity}.go` now, this one is interesting, once we add **GORM** into our
-  project and with that **database structs**, we'll have to _transform_ these
-  GQL Input types into database representation to be stored in the _db_ and
-  vice-versa to return queries from _db_ to _GQL_ for example.
+- `transformations/{entity_plural}.go` now, this one is interesting, once we add
+  **GORM** into our project and with that **database structs**, we'll have to
+  _transform_ these GQL Input types into database representation to be stored in
+  the _db_ and vice-versa to return queries from _db_ to _GQL_ for example.
 - Then I move whatever was generated from
   `internal/gql/resolvers/generated/generated.go` to
   `internal/gql/resolvers/main.go` and trim it from the entity methods we might
