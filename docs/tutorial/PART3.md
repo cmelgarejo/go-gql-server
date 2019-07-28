@@ -1,7 +1,7 @@
 # Creating an opinionated Go GQL Server - Part 3
 
-This is part of a series, not suited for beginners, but you can check it out
-from the start:
+This is part of a series, not suited for beginners, but welcome too! You can
+check it out from the start
 
 - [Part 1](PART1.md)
 - [Part 2](PART2.md)
