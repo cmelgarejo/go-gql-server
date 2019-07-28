@@ -165,10 +165,10 @@ Now first we see a couple of packages more dependant on migration,
 
 Let's start by setting up the models that can be added in the `updateMigration`
 func, so to define `user.go` but first, I have a special need for all my models,
-I want some of them to be soft deletable (not removed from the table itself) and
-some can be utterly destroyed, since we are using GORM we can create structs
+I want some of them to be soft _deletable_ (not removed from the table itself)
+and some can be utterly destroyed, since we are using GORM we can create structs
 by using `gorm.Model` struct, or define our own, _we'll do just that_, I
-need to be changed, thers another thing, the `gorm.Model` also uses
+need to be changed, theres another thing, the `gorm.Model` also uses
 autoincremented numeric id's, but I like to complicate things so I want to
 use UUID's as primary keys :D
 
@@ -348,7 +348,7 @@ func Run(orm *orm.ORM) {
 ```
 
 And the GraphQL Handler should also receive the ORM instance, so we can use the
-database connection withing the resolvers `internal/handlers/gql.go`:
+database connection in the resolvers `internal/handlers/gql.go`:
 
 ```go
 package handlers
@@ -397,7 +397,7 @@ import (
   "github.com/cmelgarejo/go-gql-server/internal/orm"
 )
 
-// Resolver is a modifable struct that can be used to pass on properties used
+// Resolver is a modifiable struct that can be used to pass on properties used
 // in the resolvers, such as DB access
 type Resolver struct {
   ORM *orm.ORM
@@ -486,7 +486,7 @@ copy any new query or mutation resolver into a file of its own
 #!/bin/bash
 printf "\nRegenerating gqlgen files\n"
 # Optional, delete the resolver to regenerate, only if there are new queries
-# or mutations, if you are just chageing the input or type definition and
+# or mutations, if you are just changing the input or type definition and
 # doesn't impact the resolvers definitions, no need to do it
 while [[ "$#" -gt 0 ]]; do case $1 in
   -r|--resolvers)
@@ -718,7 +718,7 @@ func NewLogger() *StandardLogger {
   standardLogger.Formatter = &logrus.TextFormatter{
     FullTimestamp: true,
   }
-  // We could transform the errors into a JSON format, for external log SaaS tools such as splunk orlogstash
+  // We could transform the errors into a JSON format, for external log SaaS tools such as splunk or logstash
   // standardLogger.Formatter = &logrus.JSONFormatter{
   //   PrettyPrint: true,
   // }
@@ -804,15 +804,15 @@ func Fatalf(format string, args ...interface{}) {
 }
 ```
 
-Now we have a extedable logger package with nice features
+Now we have a extendable logger package with nice features
 
 ![logger stuff](images/p3-p5.png?raw=true 'Logging with Logrus')
 
 ### Adding server reloading on change with Realize
 
-If you are anoyed on how every change you make you have to restart you server,
-comming from developing quite a while in node.js, I really missed `nodemon`,
-luckly we have something even better in Go:
+If you are annoyed on how every change you make you have to restart you server,
+coming from developing quite a while in node.js, I really missed `nodemon`,
+luckily we have something even better in Go:
 
 > `$ go get github.com/tockins/realize`
 
@@ -893,7 +893,7 @@ unset $(grep -v '^#' .env | sed -E 's/(.*)=.*/\1/' | xargs)
 printf "\nStopped app: $app\n\n"
 ```
 
-Well, now you can run our project with `.scripts/dev-run.sh` and have it reaload
+Well, now you can run our project with `.scripts/dev-run.sh` and have it reload
 every time you make a change in your go files! Neat, right?
 
 Again, like the former parts, all the code is available in the
@@ -901,4 +901,4 @@ Again, like the former parts, all the code is available in the
 
 And...
 
-> Sorry for the long and unwinded post, here's a gopher potato: ![gopher potato](https://golang.org/doc/gopher/gophercolor.png)
+> Sorry for the long and unwind post, here's a gopher potato: ![gopher potato](https://golang.org/doc/gopher/gophercolor.png)
