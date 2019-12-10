@@ -3,13 +3,31 @@ scalar Time
 type User {
   id: ID!
   email: String!
-  userId: String
+  avatarURL: String
   name: String
   firstName: String
   lastName: String
   nickName: String
   description: String
   location: String
+  APIkey: String
+  profiles: [UserProfile]
+  createdAt: Time
+  updatedAt: Time
+}
+
+type UserProfile {
+  id: ID!
+  email: String!
+  avatarURL: String
+  name: String
+  firstName: String
+  lastName: String
+  nickName: String
+  description: String
+  location: String
+  APIkey: String
+  profiles: [UserProfile]
   createdAt: Time!
   updatedAt: Time
 }
@@ -17,7 +35,8 @@ type User {
 # Input Types
 input UserInput {
   email: String
-  userId: String
+  password: String
+  avatarURL: String
   displayName: String
   name: String
   firstName: String

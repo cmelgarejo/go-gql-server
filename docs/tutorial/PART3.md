@@ -53,7 +53,7 @@ setup database connection, let's put this code at `internal/orm/main.go`
 package orm
 
 import (
-    log "github.com/cmelgarejo/go-gql-server/internal/logger"
+    "github.com/cmelgarejo/go-gql-server/internal/logger"
 
     "github.com/cmelgarejo/go-gql-server/internal/orm/migration"
 
@@ -84,7 +84,7 @@ func init() {
 func Factory() (*ORM, error) {
     db, err := gorm.Open(dialect, dsn)
     if err != nil {
-        log.Panic("[ORM] err: ", err)
+        logger.Panic("[ORM] err: ", err)
     }
     orm := &ORM{
         DB: db,
@@ -95,7 +95,7 @@ func Factory() (*ORM, error) {
     if autoMigrate {
         err = migration.ServiceAutoMigration(orm.DB)
     }
-    log.Info("[ORM] Database connection initialized.")
+    logger.Info("[ORM] Database connection initialized.")
     return orm, err
 }
 ```
@@ -114,7 +114,7 @@ package migration
 import (
     "fmt"
 
-    log "github.com/cmelgarejo/go-gql-server/internal/logger"
+    "github.com/cmelgarejo/go-gql-server/internal/logger"
 
     "github.com/cmelgarejo/go-gql-server/internal/orm/migration/jobs"
     "github.com/cmelgarejo/go-gql-server/internal/orm/models"
@@ -133,7 +133,7 @@ func ServiceAutoMigration(db *gorm.DB) error {
     // Keep a list of migrations here
     m := gormigrate.New(db, gormigrate.DefaultOptions, nil)
     m.InitSchema(func(db *gorm.DB) error {
-        log.Info("[Migration.InitSchema] Initializing database schema")
+        logger.Info("[Migration.InitSchema] Initializing database schema")
         switch db.Dialect().GetName() {
         case "postgres":
             // Let's create the UUID extension, the user has to ahve superuser
@@ -199,6 +199,7 @@ type BaseModel struct {
 // detect the entity should soft delete
 type BaseModelSoftDelete struct {
   BaseModel
+
   DeletedAt *time.Time `sql:"index"`
 }
 ```
@@ -211,8 +212,9 @@ package models
 
 // User defines a user for the app
 type User struct {
-  BaseModelSoftDelete         // We don't to actually delete the users, maybe audit if we want to hard delete them? or wait x days to purge from the table, also
-  Email               string  `gorm:"not null;unique_index:idx_email"`
+  BaseModelSoftDelete // We don't to actually delete the users, maybe audit if we want to hard delete them? or wait x days to purge from the table, also
+
+  Email               string  `gorm:"not null;unique_index"`
   UserID              *string // External user ID
   Name                *string
   NickName            *string
@@ -275,7 +277,7 @@ Now that we have everything set-up we can modify out `cmd/gql-server/main.go`
 package main
 
 import (
-  log "github.com/cmelgarejo/go-gql-server/internal/logger"
+  "github.com/cmelgarejo/go-gql-server/internal/logger"
 
   "github.com/cmelgarejo/go-gql-server/internal/orm"
   "github.com/cmelgarejo/go-gql-server/pkg/server"
@@ -285,7 +287,7 @@ func main() {
   // Create a new ORM instance to send it to our
   orm, err := orm.Factory()
   if err != nil {
-    log.Panic(err)
+    logger.Panic(err)
   }
   // Send: ORM instance
   server.Run(orm)
@@ -298,7 +300,7 @@ Also `pkg/server/main.go`:
 package server
 
 import (
-  log "github.com/cmelgarejo/go-gql-server/internal/logger"
+  "github.com/cmelgarejo/go-gql-server/internal/logger"
 
   "github.com/cmelgarejo/go-gql-server/internal/orm"
 
@@ -311,8 +313,8 @@ var host, port, gqlPath, gqlPgPath string
 var isPgEnabled bool
 
 func init() {
-  host = utils.MustGet("GQL_SERVER_HOST")
-  port = utils.MustGet("GQL_SERVER_PORT")
+  host = utils.MustGet("SERVER_HOST")
+  port = utils.MustGet("SERVER_PORT")
   gqlPath = utils.MustGet("GQL_SERVER_GRAPHQL_PATH")
   gqlPgPath = utils.MustGet("GQL_SERVER_GRAPHQL_PLAYGROUND_PATH")
   isPgEnabled = utils.MustGetBool("GQL_SERVER_GRAPHQL_PLAYGROUND_ENABLED")
@@ -320,7 +322,7 @@ func init() {
 
 // Run spins up the server
 func Run(orm *orm.ORM) {
-  log.Info("GORM_CONNECTION_DSN: ", utils.MustGet("GORM_CONNECTION_DSN"))
+  logger.Info("GORM_CONNECTION_DSN: ", utils.MustGet("GORM_CONNECTION_DSN"))
 
   endpoint := "http://" + host + ":" + port
 
@@ -333,17 +335,17 @@ func Run(orm *orm.ORM) {
   // Playground handler
   if isPgEnabled {
     r.GET(gqlPgPath, handlers.PlaygroundHandler(gqlPath))
-    log.Info("GraphQL Playground @ " + endpoint + gqlPgPath)
+    logger.Info("GraphQL Playground @ " + endpoint + gqlPgPath)
   }
   // Pass in the ORM instance to the GraphqlHandler
   r.POST(gqlPath, handlers.GraphqlHandler(orm))
-  log.Info("GraphQL @ " + endpoint + gqlPath)
+  logger.Info("GraphQL @ " + endpoint + gqlPath)
 
   // Run the server
   // Inform the user where the server is listening
-  log.Info("Running @ " + endpoint)
+  logger.Info("Running @ " + endpoint)
   // Print out and exit(1) to the OS if the server cannot run
-  log.Fatal(r.Run(host + ":" + port))
+  logger.Fatal(r.Run(host + ":" + port))
 }
 ```
 
@@ -513,7 +515,7 @@ package resolvers
 import (
   "context"
 
-  log "github.com/cmelgarejo/go-gql-server/internal/logger"
+  "github.com/cmelgarejo/go-gql-server/internal/logger"
 
   "github.com/cmelgarejo/go-gql-server/internal/gql/models"
   tf "github.com/cmelgarejo/go-gql-server/internal/gql/resolvers/transformations"
@@ -579,7 +581,7 @@ func userList(r *queryResolver, id *string) (*models.Users, error) {
   db = db.Find(&dbRecords).Count(&record.Count)
   for _, dbRec := range dbRecords {
     if rec, err := tf.DBUserToGQLUser(dbRec); err != nil {
-      log.Errorfn(entity, err)
+      logger.Errorfn(entity, err)
     } else {
       record.List = append(record.List, rec)
     }
@@ -635,7 +637,7 @@ func GQLInputUserToDBUser(i *gql.UserInput, update bool, ids ...string) (o *dbm.
     Location:    i.Location,
   }
   if i.Email == nil && !update {
-    return nil, errors.New("Field [email] is required")
+    return nil, errors.New("field [email] is required")
   }
   if i.Email != nil {
     o.Email = *i.Email

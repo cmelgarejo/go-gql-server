@@ -4,7 +4,7 @@
 
 # Pick up all the schema files you put in this directory
 schema:
-  - 'internal/gql/schemas/**/*.graphql'
+  - "internal/gql/schemas/**/*.graphql"
 # Let gqlgen know where to put the generated server
 exec:
   filename: internal/gql/generated.go

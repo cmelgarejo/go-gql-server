@@ -2,8 +2,9 @@ package resolvers
 
 import (
 	"context"
+	"errors"
 
-	log "github.com/cmelgarejo/go-gql-server/internal/logger"
+	"github.com/cmelgarejo/go-gql-server/internal/logger"
 
 	"github.com/cmelgarejo/go-gql-server/internal/gql/models"
 	tf "github.com/cmelgarejo/go-gql-server/internal/gql/resolvers/transformations"
@@ -27,6 +28,9 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, err
 
 // Users lists records
 func (r *queryResolver) Users(ctx context.Context, id *string) (*models.Users, error) {
+	currentUser := getCurrentUser(ctx)
+	// Check permissions!!
+	logger.Infof("currentUser: %+v", currentUser)
 	return userList(r, id)
 }
 
@@ -41,12 +45,15 @@ func userCreateUpdate(r *mutationResolver, input models.UserInput, update bool, 
 	db := r.ORM.DB.New().Begin()
 	if !update {
 		db = db.Create(dbo).First(dbo) // Create the user
+		if db.Error != nil {
+			return nil, db.Error
+		}
 	} else {
 		db = db.Model(&dbo).Update(dbo).First(dbo) // Or update it
 	}
 	gql, err := tf.DBUserToGQLUser(dbo)
 	if err != nil {
-		db.RollbackUnlessCommitted()
+		db.Rollback()
 		return nil, err
 	}
 	db = db.Commit()
@@ -54,7 +61,7 @@ func userCreateUpdate(r *mutationResolver, input models.UserInput, update bool, 
 }
 
 func userDelete(r *mutationResolver, id string) (bool, error) {
-	return false, nil
+	return false, errors.New("not implemented")
 }
 
 func userList(r *queryResolver, id *string) (*models.Users, error) {
@@ -69,7 +76,7 @@ func userList(r *queryResolver, id *string) (*models.Users, error) {
 	db = db.Find(&dbRecords).Count(&record.Count)
 	for _, dbRec := range dbRecords {
 		if rec, err := tf.DBUserToGQLUser(dbRec); err != nil {
-			log.Errorfn(entity, err)
+			logger.Errorfn(entity, err)
 		} else {
 			record.List = append(record.List, rec)
 		}

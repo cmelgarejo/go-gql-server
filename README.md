@@ -1,5 +1,7 @@
 # Go-GQL-Server
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/cmelgarejo/go-gql-server)](https://goreportcard.com/report/github.com/cmelgarejo/go-gql-server)
+
 Opinionated GraphQL server using:
 
 - [Gin-gonic](https://gin-gonic.com) web framework

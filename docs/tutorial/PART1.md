@@ -22,8 +22,8 @@ strand from it a little bit from it's guidelines.
 Start by creating a directory anywhere we want to:
 
 ```bash
-$ mkdir go-gql-server
-$ cd go-gql-server
+> mkdir go-gql-server
+> cd go-gql-server
 /go-gql-server $
 ```
 
@@ -81,7 +81,7 @@ And paste this placeholder code:
 package main
 
 import (
-    log "github.com/cmelgarejo/go-gql-server/internal/logger"
+    "github.com/cmelgarejo/go-gql-server/internal/logger"
     "net/http"
 
     "github.com/gin-gonic/gin"
@@ -97,9 +97,9 @@ func main() {
         c.JSON(http.StatusOK, "OK")
     })
     // Inform the user where the server is listening
-    log.Println("Running @ http://" + host + ":" + port + pathGQL)
+    logger.Println("Running @ http://" + host + ":" + port + pathGQL)
     // Print out and exit(1) to the OS if the server cannot run
-    log.Fatalln(r.Run(host + ":" + port))
+    logger.Fatalln(r.Run(host + ":" + port))
 }
 ```
 
@@ -133,7 +133,7 @@ func Ping() gin.HandlerFunc {
 package server
 
 import (
-    log "github.com/cmelgarejo/go-gql-server/internal/logger"
+    "github.com/cmelgarejo/go-gql-server/internal/logger"
 
     "github.com/gin-gonic/gin"
     "github.com/cmelgarejo/go-gql-server/internal/handlers"
@@ -151,8 +151,8 @@ func Run() {
     r := gin.Default()
     // Setup routes
     r.GET("/ping", handlers.Ping())
-    log.Println("Running @ http://" + HOST + ":" + PORT )
-    log.Fatalln(r.Run(HOST + ":" + PORT))
+    logger.Println("Running @ http://" + HOST + ":" + PORT )
+    logger.Fatalln(r.Run(HOST + ":" + PORT))
 }
 ```
 
@@ -203,7 +203,7 @@ $ chmod +x scripts/build.sh
 Now we can start building our server, like so:
 
 ```bash
-$ .scripts/build.sh
+> .scripts/build.sh
 
 Building: gql-server
 
@@ -244,7 +244,7 @@ And we can further improve our server code, and make configurations load from a
 package utils
 
 import (
-    log "github.com/cmelgarejo/go-gql-server/internal/logger"
+    "github.com/cmelgarejo/go-gql-server/internal/logger"
     "os"
     "strconv"
 )
@@ -253,7 +253,7 @@ import (
 func MustGet(k string) string {
     v := os.Getenv(k)
     if v == "" {
-        log.Panicln("ENV missing, key: " + k)
+        logger.Panicln("ENV missing, key: " + k)
     }
     return v
 }
@@ -262,11 +262,11 @@ func MustGet(k string) string {
 func MustGetBool(k string) bool {
     v := os.Getenv(k)
     if v == "" {
-        log.Panicln("ENV missing, key: " + k)
+        logger.Panicln("ENV missing, key: " + k)
     }
     b, err := strconv.ParseBool(v)
     if err != nil {
-        log.Panicln("ENV err: [" + k + "]\n" + err.Error())
+        logger.Panicln("ENV err: [" + k + "]\n" + err.Error())
     }
     return b
 }
@@ -281,7 +281,7 @@ program will panic, we need these to run. Now, changing:
 package server
 
 import (
-    log "github.com/cmelgarejo/go-gql-server/internal/logger"
+    "github.com/cmelgarejo/go-gql-server/internal/logger"
 
     "github.com/gin-gonic/gin"
     "github.com/cmelgarejo/go-gql-server/internal/handlers"
@@ -291,8 +291,8 @@ import (
 var host, port string
 
 func init() {
-    host = utils.MustGet("GQL_SERVER_HOST")
-    port = utils.MustGet("GQL_SERVER_PORT")
+    host = utils.MustGet("SERVER_HOST")
+    port = utils.MustGet("SERVER_PORT")
 }
 
 // Run spins up the server
@@ -301,9 +301,9 @@ func Run() {
     // Simple keep-alive/ping handler
     r.GET("/ping", handlers.Ping())
     // Inform the user where the server is listening
-    log.Println("Running @ http://" + host + ":" + port)
+    logger.Println("Running @ http://" + host + ":" + port)
     // Print out and exit(1) to the OS if the server cannot run
-    log.Fatalln(r.Run(host + ":" + port))
+    logger.Fatalln(r.Run(host + ":" + port))
 
 }
 ```
