@@ -7,20 +7,31 @@ import (
 )
 
 var (
-	uname                    = "Test User"
-	fname                    = "Test"
-	lname                    = "User"
-	nname                    = "Foo Bar"
-	description              = "This is the first user ever!"
-	location                 = "His house, maybe?"
-	firstUser   *models.User = &models.User{
-		Email:       "test@test.com",
-		Name:        &uname,
-		FirstName:   &fname,
-		LastName:    &lname,
-		NickName:    &nname,
-		Description: &description,
-		Location:    &location,
+	uname       = "Test User"
+	fname       = "Test"
+	lname       = "User"
+	nname       = "Foo Bar"
+	description = "This is the first user ever!"
+	location    = "His house, maybe?"
+	users       = []*models.User{
+		&models.User{
+			Email:       "test@test.com",
+			Name:        &uname,
+			FirstName:   &fname,
+			LastName:    &lname,
+			NickName:    &nname,
+			Description: &description,
+			Location:    &location,
+		},
+		&models.User{
+			Email:       "test2@test.com",
+			Name:        &uname,
+			FirstName:   &fname,
+			LastName:    &lname,
+			NickName:    &nname,
+			Description: &description,
+			Location:    &location,
+		},
 	}
 )
 
@@ -28,9 +39,22 @@ var (
 var SeedUsers *gormigrate.Migration = &gormigrate.Migration{
 	ID: "SEED_USERS",
 	Migrate: func(db *gorm.DB) error {
-		return db.Create(&firstUser).Error
+		for _, u := range users {
+			if err := db.Create(u).Error; err != nil {
+				return err
+			}
+			if err := db.Create(&models.UserAPIKey{UserID: u.ID}).Error; err != nil {
+				return err
+			}
+		}
+		return nil
 	},
 	Rollback: func(db *gorm.DB) error {
-		return db.Delete(&firstUser).Error
+		for _, u := range users {
+			if err := db.Delete(u).Error; err != nil {
+				return err
+			}
+		}
+		return nil
 	},
 }

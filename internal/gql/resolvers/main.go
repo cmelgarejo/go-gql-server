@@ -1,8 +1,15 @@
 package resolvers
 
 import (
+	"context"
+
+	"github.com/cmelgarejo/go-gql-server/internal/logger"
+
+	"github.com/cmelgarejo/go-gql-server/pkg/utils"
+
 	"github.com/cmelgarejo/go-gql-server/internal/gql"
 	"github.com/cmelgarejo/go-gql-server/internal/orm"
+	dbm "github.com/cmelgarejo/go-gql-server/internal/orm/models"
 )
 
 // Resolver is a modifable struct that can be used to pass on properties used
@@ -24,3 +31,8 @@ func (r *Resolver) Query() gql.QueryResolver {
 type mutationResolver struct{ *Resolver }
 
 type queryResolver struct{ *Resolver }
+
+func getCurrentUser(ctx context.Context) *dbm.User {
+	logger.Info(ctx)
+	return ctx.Value(utils.ProjectContextKeys.UserCtxKey).(*dbm.User)
+}
