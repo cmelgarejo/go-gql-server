@@ -3,6 +3,8 @@ package consts
 import (
 	"fmt"
 	"strings"
+
+	"github.com/cmelgarejo/go-gql-server/pkg/utils"
 )
 
 type permissionTypes struct {
@@ -15,16 +17,25 @@ type permissionTypes struct {
 	Upload string
 }
 
-type tablenames struct {
-	Users       string
-	Roles       string
-	Permissions string
+type entitynames struct {
+	Users           string
+	Roles           string
+	Permissions     string
+	RoleParents     string
+	RolePermissions string
+	UserPermissions string
+	UserProfiles    string
+	UserRoles       string
 }
 
-type roles struct {
-	Admin string
-	User  string
-	// You can add more as you need
+type role struct {
+	Name        string
+	Description string
+}
+
+type dialects struct {
+	PostgresSQL string
+	MySQL       string
 }
 
 var (
@@ -38,13 +49,40 @@ var (
 		Assign: "assign:%s",
 		Upload: "upload:%s",
 	}
-	// Tablenames the names of the tables in the server
-	Tablenames = tablenames{
-		Users:       "users",
-		Roles:       "roles",
-		Permissions: "permissions",
+	// EntityNames the names of the tables in the server
+	EntityNames = entitynames{
+		Users:           "Users",
+		Roles:           "Roles",
+		Permissions:     "Permissions",
+		RoleParents:     "RoleParents",
+		RolePermissions: "RolePermissions",
+		UserPermissions: "UserPermissions",
+		UserProfiles:    "UserProfiles",
+		UserRoles:       "UserRoles",
+	}
+	// Dialects are definition of databases
+	Dialects = dialects{
+		PostgresSQL: "postgres",
+		MySQL:       "mysql",
+	}
+
+	// Roles that are part of the systme
+	Roles = []role{
+		role{
+			Name:        "admin",
+			Description: "Administrator of the app",
+		},
+		role{
+			Name:        "user",
+			Description: "Normal user of the app",
+		},
 	}
 )
+
+// GetTableName gets the db normalized tablename
+func GetTableName(tablename string) string {
+	return utils.ToSnakeCase(tablename)
+}
 
 // FormatPermissionTag returns a string formatted action:entity permission
 func FormatPermissionTag(action string, entity string) string {

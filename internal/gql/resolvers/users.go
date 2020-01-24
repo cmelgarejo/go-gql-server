@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/cmelgarejo/go-gql-server/pkg/utils/consts"
+
 	"github.com/cmelgarejo/go-gql-server/internal/logger"
 
 	"github.com/cmelgarejo/go-gql-server/internal/gql/models"
@@ -28,9 +30,10 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, err
 
 // Users lists records
 func (r *queryResolver) Users(ctx context.Context, id *string) (*models.Users, error) {
-	currentUser := getCurrentUser(ctx)
-	// Check permissions!!
-	logger.Infof("currentUser: %+v", currentUser)
+	cu := getCurrentUser(ctx)
+	if ok, err := cu.HasPermission(consts.Permissions.List, consts.GetTableName(consts.EntityNames.Users)); !ok || err != nil {
+		return nil, logger.Errorfn(consts.EntityNames.Users, err)
+	}
 	return userList(r, id)
 }
 
@@ -42,22 +45,23 @@ func userCreateUpdate(r *mutationResolver, input models.UserInput, update bool, 
 		return nil, err
 	}
 	// Create scoped clean db interface
-	db := r.ORM.DB.New().Begin()
+	tx := r.ORM.DB.Begin()
+	defer tx.RollbackUnlessCommitted()
 	if !update {
-		db = db.Create(dbo).First(dbo) // Create the user
-		if db.Error != nil {
-			return nil, db.Error
+		tx = tx.Create(dbo).First(dbo) // Create the user
+		if tx.Error != nil {
+			return nil, tx.Error
 		}
 	} else {
-		db = db.Model(&dbo).Update(dbo).First(dbo) // Or update it
+		tx = tx.Model(&dbo).Update(dbo).First(dbo) // Or update it
 	}
 	gql, err := tf.DBUserToGQLUser(dbo)
 	if err != nil {
-		db.Rollback()
+		tx.Rollback()
 		return nil, err
 	}
-	db = db.Commit()
-	return gql, db.Error
+	tx = tx.Commit()
+	return gql, tx.Error
 }
 
 func userDelete(r *mutationResolver, id string) (bool, error) {
@@ -65,15 +69,16 @@ func userDelete(r *mutationResolver, id string) (bool, error) {
 }
 
 func userList(r *queryResolver, id *string) (*models.Users, error) {
-	entity := "users"
+	entity := consts.GetTableName(consts.EntityNames.Users)
 	whereID := "id = ?"
 	record := &models.Users{}
 	dbRecords := []*dbm.User{}
-	db := r.ORM.DB.New()
+	tx := r.ORM.DB.Begin()
+	defer tx.RollbackUnlessCommitted()
 	if id != nil {
-		db = db.Where(whereID, *id)
+		tx = tx.Where(whereID, *id)
 	}
-	db = db.Find(&dbRecords).Count(&record.Count)
+	tx = tx.Find(&dbRecords).Count(&record.Count)
 	for _, dbRec := range dbRecords {
 		if rec, err := tf.DBUserToGQLUser(dbRec); err != nil {
 			logger.Errorfn(entity, err)
@@ -81,5 +86,5 @@ func userList(r *queryResolver, id *string) (*models.Users, error) {
 			record.List = append(record.List, rec)
 		}
 	}
-	return record, db.Error
+	return record, tx.Error
 }

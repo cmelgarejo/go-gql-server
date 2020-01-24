@@ -12,48 +12,43 @@ import (
 )
 
 func updateMigration(db *gorm.DB) (err error) {
-	err = db.AutoMigrate(
+	db.AutoMigrate(
 		&models.Role{},
 		&models.Permission{},
-		&models.User{},
 		&models.UserProfile{},
 		&models.UserAPIKey{},
-	).Error
-	if err != nil {
-		return err
-	}
+		&models.User{},
+	)
 	return addIndexes(db)
 }
 
 func addIndexes(db *gorm.DB) (err error) {
 	// Entity names
 	//db.NewScope(&models.User{}).GetModelStruct().TableName(db)
-	usersTableName := consts.Tablenames.Users
-	rolesTableName := consts.Tablenames.Roles
-	permissionsTableName := consts.Tablenames.Permissions
+
 	// FKs
 	if err := db.Model(&models.UserProfile{}).
-		AddForeignKey("user_id", usersTableName+"(id)", "RESTRICT", "RESTRICT").Error; err != nil {
+		AddForeignKey("user_id", consts.GetTableName(consts.EntityNames.Users)+"(id)", "RESTRICT", "RESTRICT").Error; err != nil {
 		return err
 	}
 	if err := db.Model(&models.UserAPIKey{}).
-		AddForeignKey("user_id", usersTableName+"(id)", "RESTRICT", "RESTRICT").Error; err != nil {
+		AddForeignKey("user_id", consts.GetTableName(consts.EntityNames.Users)+"(id)", "RESTRICT", "RESTRICT").Error; err != nil {
 		return err
 	}
 	if err := db.Model(&models.UserRole{}).
-		AddForeignKey("user_id", usersTableName+"(id)", "CASCADE", "CASCADE").Error; err != nil {
+		AddForeignKey("user_id", consts.GetTableName(consts.EntityNames.Users)+"(id)", "CASCADE", "CASCADE").Error; err != nil {
 		return err
 	}
 	if err := db.Model(&models.UserRole{}).
-		AddForeignKey("role_id", rolesTableName+"(id)", "CASCADE", "CASCADE").Error; err != nil {
+		AddForeignKey("role_id", consts.GetTableName(consts.EntityNames.Roles)+"(id)", "CASCADE", "CASCADE").Error; err != nil {
 		return err
 	}
 	if err := db.Model(&models.UserPermission{}).
-		AddForeignKey("user_id", usersTableName+"(id)", "CASCADE", "CASCADE").Error; err != nil {
+		AddForeignKey("user_id", consts.GetTableName(consts.EntityNames.Users)+"(id)", "CASCADE", "CASCADE").Error; err != nil {
 		return err
 	}
 	if err := db.Model(&models.UserPermission{}).
-		AddForeignKey("permission_id", permissionsTableName+"(id)", "CASCADE", "CASCADE").Error; err != nil {
+		AddForeignKey("permission_id", consts.GetTableName(consts.EntityNames.Permissions)+"(id)", "CASCADE", "CASCADE").Error; err != nil {
 		return err
 	}
 	// Indexes
@@ -68,8 +63,8 @@ func ServiceAutoMigration(db *gorm.DB) error {
 	m.InitSchema(func(db *gorm.DB) error {
 		logger.Info("[Migration.InitSchema] Initializing database schema")
 		switch db.Dialect().GetName() {
-		case "postgres":
-			db.Exec("CREATE EXTENSION IF NOT EXISTS\"uuid-ossp\";")
+		case consts.Dialects.PostgresSQL:
+			db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
 		}
 		if err := updateMigration(db); err != nil {
 			return fmt.Errorf("[Migration.InitSchema]: %v", err)
@@ -83,8 +78,8 @@ func ServiceAutoMigration(db *gorm.DB) error {
 	}
 	// Keep a list of migrations here
 	m = gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
-		jobs.SeedUsers,
 		jobs.SeedRBAC,
+		jobs.SeedUsers,
 	})
 	return m.Migrate()
 }

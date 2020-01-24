@@ -48,7 +48,7 @@ func Callback(cfg *utils.ServerConfig, orm *orm.ORM) gin.HandlerFunc {
 		// logger.Infof("gothUser: %#v", user)
 		if err != nil {
 			if u, err = orm.UpsertUserProfile(&user); err != nil {
-				logger.Errorf("[Auth.CallBack.UserLoggedIn.UpsertUserProfile.Error]: %q", err)
+				logger.Errorf("[Auth.CallBack.UserLoggedIn.UpsertUserProfile.Error]: %v", err)
 				c.AbortWithError(http.StatusInternalServerError, err)
 			}
 		}

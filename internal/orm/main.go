@@ -4,6 +4,9 @@ package orm
 
 import (
 	"errors"
+	"fmt"
+
+	"github.com/cmelgarejo/go-gql-server/pkg/utils/consts"
 
 	"github.com/cmelgarejo/go-gql-server/internal/gql/resolvers/transformations"
 
@@ -15,22 +18,21 @@ import (
 	"github.com/cmelgarejo/go-gql-server/internal/orm/migration"
 
 	"github.com/cmelgarejo/go-gql-server/pkg/utils"
+
 	//Imports the database dialect of choice
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 
 	"github.com/jinzhu/gorm"
 )
 
-var autoMigrate, logMode, seedDB bool
-var dsn, dialect string
+var (
+	sUserTbl  = "User"
+	nestedFmt = "%s.%s"
+)
 
 // ORM struct to holds the gorm pointer to db
 type ORM struct {
 	DB *gorm.DB
-}
-
-func init() {
-
 }
 
 // Factory creates a db connection with the selected dialect and connection
@@ -56,12 +58,14 @@ func Factory(cfg *utils.ServerConfig) (*ORM, error) {
 
 //FindUserByAPIKey finds the user that is related to the API key
 func (o *ORM) FindUserByAPIKey(apiKey string) (*models.User, error) {
-	db := o.DB.New()
-	uak := &models.UserAPIKey{}
 	if apiKey == "" {
 		return nil, errors.New("API key is empty")
 	}
-	if err := db.Preload("User").Where("api_key = ?", apiKey).Find(uak).Error; err != nil {
+	uak := &models.UserAPIKey{}
+	up := fmt.Sprintf(nestedFmt, sUserTbl, consts.EntityNames.Permissions)
+	ur := fmt.Sprintf(nestedFmt, sUserTbl, consts.EntityNames.Roles)
+	if err := o.DB.Preload(sUserTbl).Preload(up).Preload(ur).
+		Where("api_key = ?", apiKey).Find(uak).Error; err != nil {
 		return nil, err
 	}
 	return &uak.User, nil
@@ -69,16 +73,19 @@ func (o *ORM) FindUserByAPIKey(apiKey string) (*models.User, error) {
 
 // FindUserByJWT finds the user that is related to the APIKey token
 func (o *ORM) FindUserByJWT(email string, provider string, userID string) (*models.User, error) {
-	db := o.DB.New()
-	up := &models.UserProfile{}
 	if provider == "" || userID == "" {
 		return nil, errors.New("provider or userId empty")
 	}
-	if err := db.Preload("User").Where("email  = ? AND provider = ? AND external_user_id = ?", email, provider, userID).
-		First(up).Error; err != nil {
+	tx := o.DB.Begin()
+	p := &models.UserProfile{}
+	up := fmt.Sprintf(nestedFmt, sUserTbl, consts.EntityNames.Permissions)
+	ur := fmt.Sprintf(nestedFmt, sUserTbl, consts.EntityNames.Roles)
+	if err := tx.Preload(sUserTbl).Preload(up).Preload(ur).
+		Where("email  = ? AND provider = ? AND external_user_id = ?", email, provider, userID).
+		First(p).Error; err != nil {
 		return nil, err
 	}
-	return &up.User, nil
+	return &p.User, nil
 }
 
 // UpsertUserProfile saves the user if doesn't exists and adds the OAuth profile

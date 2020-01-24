@@ -33,6 +33,7 @@ type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 
 func getCurrentUser(ctx context.Context) *dbm.User {
-	logger.Info(ctx)
-	return ctx.Value(utils.ProjectContextKeys.UserCtxKey).(*dbm.User)
+	cu := ctx.Value(utils.ProjectContextKeys.UserCtxKey).(*dbm.User)
+	logger.Infof("currentUser: %s - %s", cu.Email, cu.ID)
+	return cu
 }

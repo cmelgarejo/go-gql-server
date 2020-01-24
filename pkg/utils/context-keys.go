@@ -9,7 +9,7 @@ type ContextKeys struct {
 var (
 	// ProjectContextKeys the project's context keys
 	ProjectContextKeys = ContextKeys{
-		ProviderCtxKey: "provider",
-		UserCtxKey:     "auth-user",
+		ProviderCtxKey: "gg-provider",
+		UserCtxKey:     "gg-auth-user",
 	}
 )

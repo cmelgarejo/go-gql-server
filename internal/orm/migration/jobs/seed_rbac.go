@@ -15,38 +15,65 @@ import (
 var SeedRBAC *gormigrate.Migration = &gormigrate.Migration{
 	ID: "SEED_RBAC",
 	Migrate: func(db *gorm.DB) error {
-		db = db.Begin()
-		v := reflect.ValueOf(consts.Tablenames)
+		tx := db.Begin()
+		defer tx.RollbackUnlessCommitted()
+		v := reflect.ValueOf(consts.EntityNames)
 		tablenames := make([]interface{}, v.NumField())
 		for i := 0; i < v.NumField(); i++ {
-			tablenames[i] = v.Field(i).Interface()
+			tablenames[i] = consts.GetTableName(v.Field(i).Interface().(string))
 		}
 		v = reflect.ValueOf(consts.Permissions)
 		permissions := make([]interface{}, v.NumField())
 		for i := 0; i < v.NumField(); i++ {
 			permissions[i] = v.Field(i).Interface()
 		}
+		padmin := []models.Permission{}
 		for _, t := range tablenames {
 			for _, p := range permissions {
-				if err := db.Create(&models.Permission{
+				permission := models.Permission{
 					Tag:         consts.FormatPermissionTag(p.(string), t.(string)),
 					Description: consts.FormatPermissionDesc(p.(string), t.(string)),
-				}).Error; err != nil {
-					// db.RollbackUnlessCommitted()
-					logger.Error("[Migration.Jobs.SeedRBAC] error: ", err)
+				}
+				if err := tx.Create(&permission).First(&permission).Error; err != nil {
+					logger.Error("[Migration.Jobs.SeedRBAC.permissions] error: ", err)
 					return err
 				}
+				padmin = append(padmin, permission)
 			}
 		}
-		db.Commit()
+		for _, r := range consts.Roles {
+			role := &models.Role{
+				Name:        r.Name,
+				Description: r.Description,
+			}
+			if err := tx.Create(role).First(&role).Error; err != nil {
+				logger.Error("[Migration.Jobs.SeedRBAC.roles] error: ", err)
+				return err
+			}
+			switch r.Name {
+			case "admin":
+				for _, p := range padmin {
+					tx.Model(role).Association(consts.EntityNames.Permissions).Append(p)
+				}
+			case "user":
+				// Permissions for user role
+				// for _, p := range puser {
+				// 	tx.Model(role).Association(consts.EntityNames.Permissions).Append(p)
+				// }
+			}
+		}
+		tx.Commit()
 		return nil
 	},
 	Rollback: func(db *gorm.DB) error {
+		tx := db.Begin()
+		defer tx.RollbackUnlessCommitted()
 		for _, u := range users {
-			if err := db.Delete(u).Error; err != nil {
+			if err := tx.Delete(u).Error; err != nil {
 				return err
 			}
 		}
+		tx.Commit()
 		return nil
 	},
 }

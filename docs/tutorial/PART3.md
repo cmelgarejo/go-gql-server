@@ -550,7 +550,7 @@ func userCreateUpdate(r *mutationResolver, input models.UserInput, update bool, 
     return nil, err
   }
   // Create scoped clean db interface
-  db := r.ORM.DB.New().Begin()
+  db := r.ORM.DB.Begin()
   if !update {
     db = db.Create(dbo).First(dbo) // Create the user
   } else {
@@ -574,7 +574,7 @@ func userList(r *queryResolver, id *string) (*models.Users, error) {
   whereID := "id = ?"
   record := &models.Users{}
   dbRecords := []*dbm.User{}
-  db := r.ORM.DB.New()
+  db := r.ORM.DB
   if id != nil {
     db = db.Where(whereID, *id)
   }
@@ -661,19 +661,19 @@ permissions to the resolvers.
 
 Hey, now we can query and mutate our users from the database!
 
-![gql is showing db data!](images/p3-p1.png?raw=true 'Hey there, sexy! (2)')
+![gql is showing db data!](images/p3-p1.png?raw=true "Hey there, sexy! (2)")
 
 And a specific user from the database:
 
-![gql is showing db data!](images/p3-p2.png?raw=true 'Hey there, sexy! (3)')
+![gql is showing db data!](images/p3-p2.png?raw=true "Hey there, sexy! (3)")
 
 We can always create a new one:
 
-![gql is creating db data!](images/p3-p3.png?raw=true 'Hey there, sexy! (4)')
+![gql is creating db data!](images/p3-p3.png?raw=true "Hey there, sexy! (4)")
 
 And update it:
 
-![gql is updating db data!](images/p3-p4.png?raw=true 'Hey there, sexy! (5)')
+![gql is updating db data!](images/p3-p4.png?raw=true "Hey there, sexy! (5)")
 
 Okay, and as promised let's enhance our little project a bit more by adding a
 couple of packages next.
@@ -808,7 +808,7 @@ func Fatalf(format string, args ...interface{}) {
 
 Now we have a extendable logger package with nice features
 
-![logger stuff](images/p3-p5.png?raw=true 'Logging with Logrus')
+![logger stuff](images/p3-p5.png?raw=true "Logging with Logrus")
 
 ### Adding server reloading on change with Realize
 
@@ -827,15 +827,15 @@ settings:
   files:
     outputs:
       status: false
-      path: ''
+      path: ""
       name: .r.outputs.log
     logs:
       status: false
-      path: ''
+      path: ""
       name: .r.logs.log
     errors:
       status: false
-      path: ''
+      path: ""
       name: .r.errors.log
   legacy:
     force: false

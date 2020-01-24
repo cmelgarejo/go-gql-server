@@ -15,22 +15,24 @@ var (
 	location    = "His house, maybe?"
 	users       = []*models.User{
 		&models.User{
-			Email:       "test@test.com",
+			Email:       "admin@test.com",
 			Name:        &uname,
 			FirstName:   &fname,
 			LastName:    &lname,
 			NickName:    &nname,
 			Description: &description,
 			Location:    &location,
+			Roles:       []models.Role{models.Role{BaseModelSeq: models.BaseModelSeq{ID: 1}}},
 		},
 		&models.User{
-			Email:       "test2@test.com",
+			Email:       "user@test.com",
 			Name:        &uname,
 			FirstName:   &fname,
 			LastName:    &lname,
 			NickName:    &nname,
 			Description: &description,
 			Location:    &location,
+			Roles:       []models.Role{models.Role{BaseModelSeq: models.BaseModelSeq{ID: 2}}},
 		},
 	}
 )
@@ -39,22 +41,28 @@ var (
 var SeedUsers *gormigrate.Migration = &gormigrate.Migration{
 	ID: "SEED_USERS",
 	Migrate: func(db *gorm.DB) error {
+		tx := db.Begin()
+		defer tx.RollbackUnlessCommitted()
 		for _, u := range users {
-			if err := db.Create(u).Error; err != nil {
+			if err := tx.Create(u).Error; err != nil {
 				return err
 			}
-			if err := db.Create(&models.UserAPIKey{UserID: u.ID}).Error; err != nil {
+			if err := tx.Create(&models.UserAPIKey{UserID: u.ID}).Error; err != nil {
 				return err
 			}
 		}
+		tx.Commit()
 		return nil
 	},
 	Rollback: func(db *gorm.DB) error {
+		tx := db.Begin()
+		defer tx.RollbackUnlessCommitted()
 		for _, u := range users {
-			if err := db.Delete(u).Error; err != nil {
+			if err := tx.Delete(u).Error; err != nil {
 				return err
 			}
 		}
+		tx.Commit()
 		return nil
 	},
 }
