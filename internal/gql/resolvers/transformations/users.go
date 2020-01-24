@@ -103,7 +103,7 @@ func GothUserToDBUserProfile(i *goth.User, update bool, ids ...int) (o *dbm.User
 		NickName:       i.NickName,
 		Location:       i.Location,
 		AvatarURL:      i.AvatarURL,
-		Description:    &i.Description,
+		Description:    i.Description,
 	}
 	if len(ids) > 0 {
 		updID := ids[0]

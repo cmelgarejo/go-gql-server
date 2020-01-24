@@ -495,7 +495,7 @@ Here the real search for the user is made in `FindUserByJWT` for JWT tokens and
 ```go
 //FindUserByAPIKey finds the user that is related to the API key
 func (o *ORM) FindUserByAPIKey(apiKey string) (*models.User, error) {
-    db := o.DB.New()
+    db := o.DB
     uak := &models.UserAPIKey{}
     if apiKey == "" {
         return nil, errors.New("API key is empty")
@@ -508,7 +508,7 @@ func (o *ORM) FindUserByAPIKey(apiKey string) (*models.User, error) {
 
 // FindUserByJWT finds the user that is related to the APIKey token
 func (o *ORM) FindUserByJWT(email string, provider string, userID string) (*models.User, error) {
-    db := o.DB.New()
+    db := o.DB
     up := &models.UserProfile{}
     if provider == "" || userID == "" {
         return nil, errors.New("provider or userId empty")
@@ -521,7 +521,7 @@ func (o *ORM) FindUserByJWT(email string, provider string, userID string) (*mode
 
 // UpsertUserProfile saves the user if doesn't exists and adds the OAuth profile
 func (o *ORM) UpsertUserProfile(input *goth.User) (*models.User, error) {
-    db := o.DB.New()
+    db := o.DB
     u := &models.User{}
     up := &models.UserProfile{}
     u, err := transformations.GothUserToDBUser(input, false)

@@ -3,8 +3,13 @@ package models
 import (
 	"time"
 
+	"github.com/cmelgarejo/go-gql-server/pkg/utils"
+
 	"github.com/gofrs/uuid"
 )
+
+// Our models have to know also what dialect are they in
+var dialect string = utils.MustGet("GORM_DIALECT")
 
 // BaseModel defines the common columns that all db structs should hold, usually
 // db structs based on this have no soft delete

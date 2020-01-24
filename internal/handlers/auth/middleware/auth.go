@@ -27,8 +27,10 @@ func Middleware(path string, cfg *utils.ServerConfig, orm *orm.ORM) gin.HandlerF
 			if err != nil {
 				authError(c, ErrForbidden)
 			}
-			c.Request = addToContext(c, utils.ProjectContextKeys.UserCtxKey, user)
-			logger.Info("User: ", user.ID)
+			if user != nil {
+				c.Request = addToContext(c, utils.ProjectContextKeys.UserCtxKey, user)
+				logger.Info("User: ", user.ID)
+			}
 			c.Next()
 		} else {
 			if err != ErrEmptyAPIKeyHeader {
@@ -56,7 +58,10 @@ func Middleware(path string, cfg *utils.ServerConfig, orm *orm.ORM) gin.HandlerF
 							if user, err := orm.FindUserByJWT(email, issuer, userid); err != nil {
 								authError(c, ErrForbidden)
 							} else {
-								c.Request = addToContext(c, utils.ProjectContextKeys.UserCtxKey, user)
+								if user != nil {
+									c.Request = addToContext(c, utils.ProjectContextKeys.UserCtxKey, user)
+									logger.Info("User: ", user.ID)
+								}
 								c.Next()
 							}
 						} else {

@@ -44,6 +44,10 @@ input UserInput {
   nickName: String
   description: String
   location: String
+  addRoles: [ID]
+  remRoles: [ID]
+  addPermissions: [ID]
+  remPermissions: [ID]
 }
 
 # List Types
