@@ -15,23 +15,35 @@ import (
 
 // CreateUser creates a record
 func (r *mutationResolver) CreateUser(ctx context.Context, input models.UserInput) (*models.User, error) {
+	cu := getCurrentUser(ctx)
+	if ok, err := cu.HasPermission(consts.Permissions.Create, consts.EntityNames.Users); !ok || err != nil {
+		return nil, logger.Errorfn(consts.EntityNames.Users, err)
+	}
 	return userCreateUpdate(r, input, false)
 }
 
 // UpdateUser updates a record
 func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input models.UserInput) (*models.User, error) {
+	cu := getCurrentUser(ctx)
+	if ok, err := cu.HasPermission(consts.Permissions.Create, consts.EntityNames.Users); !ok || err != nil {
+		return nil, logger.Errorfn(consts.EntityNames.Users, err)
+	}
 	return userCreateUpdate(r, input, true, id)
 }
 
 // DeleteUser deletes a record
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, error) {
+	cu := getCurrentUser(ctx)
+	if ok, err := cu.HasPermission(consts.Permissions.Delete, consts.EntityNames.Users); !ok || err != nil {
+		return false, logger.Errorfn(consts.EntityNames.Users, err)
+	}
 	return userDelete(r, id)
 }
 
 // Users lists records
 func (r *queryResolver) Users(ctx context.Context, id *string) (*models.Users, error) {
 	cu := getCurrentUser(ctx)
-	if ok, err := cu.HasPermission(consts.Permissions.List, consts.GetTableName(consts.EntityNames.Users)); !ok || err != nil {
+	if ok, err := cu.HasPermission(consts.Permissions.List, consts.EntityNames.Users); !ok || err != nil {
 		return nil, logger.Errorfn(consts.EntityNames.Users, err)
 	}
 	return userList(r, id)

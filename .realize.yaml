@@ -2,15 +2,15 @@ settings:
   files:
     outputs:
       status: false
-      path: ''
+      path: ""
       name: .r.outputs.log
     logs:
       status: false
-      path: ''
+      path: ""
       name: .r.logs.log
     errors:
       status: false
-      path: ''
+      path: ""
       name: .r.errors.log
   legacy:
     force: false

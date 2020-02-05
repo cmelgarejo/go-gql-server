@@ -40,7 +40,6 @@ func Middleware(path string, cfg *utils.ServerConfig, orm *orm.ORM) gin.HandlerF
 				if err != nil {
 					authError(c, err)
 				} else {
-					// goth.ContextForClient(c.)
 					if claims, ok := t.Claims.(jwt.MapClaims); ok {
 						if claims["exp"] != nil {
 							issuer := claims["iss"].(string)
@@ -54,7 +53,6 @@ func Middleware(path string, cfg *utils.ServerConfig, orm *orm.ORM) gin.HandlerF
 								algo := claims["alg"].(string)
 								logger.Warnf("\n\nalgo: %s\n\n", algo)
 							}
-							// TODO: Verify token with each provider's JWKs
 							if user, err := orm.FindUserByJWT(email, issuer, userid); err != nil {
 								authError(c, ErrForbidden)
 							} else {

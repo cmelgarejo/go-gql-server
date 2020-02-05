@@ -25,11 +25,11 @@ type User struct {
 	FirstName           *string
 	LastName            *string
 	Location            *string
-	AvatarURL           *string `gorm:"size:1024"`
-	Description         *string `gorm:"size:1024"`
-	Profiles            []UserProfile
-	Roles               []Role       `gorm:"many2many:user_roles;association_autocreate:false;association_autoupdate:false"`
-	Permissions         []Permission `gorm:"many2many:user_permissions;association_autocreate:false;association_autoupdate:false"`
+	AvatarURL           *string       `gorm:"size:1024"`
+	Description         *string       `gorm:"size:1024"`
+	Profiles            []UserProfile `gorm:"association_autocreate:false;association_autoupdate:false"`
+	Roles               []Role        `gorm:"many2many:user_roles;association_autocreate:false;association_autoupdate:false"`
+	Permissions         []Permission  `gorm:"many2many:user_permissions;association_autocreate:false;association_autoupdate:false"`
 }
 
 // UserProfile saves all the related OAuth Profiles
@@ -52,10 +52,10 @@ type UserProfile struct {
 // UserAPIKey generated api keys for the users
 type UserAPIKey struct {
 	BaseModelSeq
-	User        User      `gorm:"association_autocreate:false;association_autoupdate:false"`
-	UserID      uuid.UUID `gorm:"not null;index"`
-	APIKey      string    `gorm:"size:128;unique_index"`
 	Name        string
+	User        User         `gorm:"association_autocreate:false;association_autoupdate:false"`
+	UserID      uuid.UUID    `gorm:"not null;index"`
+	APIKey      string       `gorm:"size:128;unique_index"`
 	Permissions []Permission `gorm:"many2many:user_api_key_permissions;association_autocreate:false;association_autoupdate:false"`
 }
 
@@ -119,7 +119,6 @@ func (k *UserAPIKey) BeforeSave(scope *gorm.Scope) error {
 		if err := db.Where("id = ?", k.UserID).First(u).Error; err != nil {
 			return err
 		}
-		// k.Name =
 	}
 	if hash, err := bcrypt.GenerateFromPassword([]byte(k.UserID.String()), 0); err == nil {
 		hasher := sha1.New()
@@ -143,7 +142,7 @@ func (u *User) HasRole(roleID int) (bool, error) {
 
 // HasPermission verifies if user has a specific permission
 func (u *User) HasPermission(permission string, entity string) (bool, error) {
-	tag := fmt.Sprintf(permission, entity)
+	tag := fmt.Sprintf(permission, consts.GetTableName(entity))
 	for _, r := range u.Permissions {
 		if r.Tag == tag {
 			return true, nil

@@ -33,6 +33,7 @@ var (
 		Location:    &emptyStr,
 		Name:        &emptyStr,
 		NickName:    &emptyStr,
+		AvatarURL:   &emptyStr,
 	}
 	dbmUserIDNoTS = &dbm.User{
 		BaseModelSoftDelete: dbm.BaseModelSoftDelete{
@@ -50,6 +51,7 @@ var (
 		Location:    &emptyStr,
 		Name:        &emptyStr,
 		NickName:    &emptyStr,
+		AvatarURL:   &emptyStr,
 	}
 	dbmUserID = &dbm.User{
 		BaseModelSoftDelete: dbm.BaseModelSoftDelete{
@@ -73,6 +75,7 @@ var (
 		Location:    emptyStr,
 		Name:        emptyStr,
 		NickName:    emptyStr,
+		AvatarURL:   emptyStr,
 		UserID:      userID,
 	}
 	userProfile = &dbm.UserProfile{
@@ -82,7 +85,7 @@ var (
 		Email:          email,
 		ExternalUserID: gUUID2.String(),
 		Provider:       provider,
-		Description:    &emptyStr,
+		Description:    emptyStr,
 		FirstName:      emptyStr,
 		LastName:       emptyStr,
 		Location:       emptyStr,
@@ -263,8 +266,6 @@ func TestGothUserToDBUser(t *testing.T) {
 			}
 			if !reflect.DeepEqual(gotO, tt.wantO) {
 				t.Errorf("GothUserToDBUser() = \n%v, want: \n%v", gotO, tt.wantO)
-				// spew.Dump(gotO)
-				// spew.Dump(gotO)
 			}
 		})
 	}
