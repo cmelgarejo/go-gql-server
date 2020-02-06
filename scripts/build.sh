@@ -2,12 +2,13 @@
 srcPath="cmd"
 pkgFile="main.go"
 outputPath="build"
-app="gql-server"
-output="$outputPath/$app"
-src="$srcPath/$app/$pkgFile"
+entrypoint="gql-server"
+outputApp="gql-server"
+output="$outputPath/$outputApp"
+src="$srcPath/$entrypoint/$pkgFile"
 
-printf "\nBuilding: $app\n"
+printf "\nBuilding: $outputApp\n"
 time go build -o $output $src
-printf "\nBuilt: $app size:"
+printf "\nBuilt: $outputApp size:"
 ls -lah $output | awk '{print $5}'
-printf "\nDone building: $app\n\n"
+printf "\nDone building: $outputApp\n\n"
