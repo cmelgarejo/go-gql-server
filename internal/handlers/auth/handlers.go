@@ -24,7 +24,7 @@ type Claims struct {
 func Begin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// You have to add value context with provider name to get provider name in GetProviderName method
-		c.Request = addProviderToContext(c, c.Param("provider"))
+		c.Request = addProviderToContext(c, c.Param(string(utils.ProjectContextKeys.ProviderCtxKey)))
 		// try to get the user without re-authenticating
 		if gothUser, err := gothic.CompleteUserAuth(c.Writer, c.Request); err != nil {
 			gothic.BeginAuthHandler(c.Writer, c.Request)
@@ -38,7 +38,7 @@ func Begin() gin.HandlerFunc {
 func Callback(cfg *utils.ServerConfig, orm *orm.ORM) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// You have to add value context with provider name to get provider name in GetProviderName method
-		c.Request = addProviderToContext(c, c.Param("provider"))
+		c.Request = addProviderToContext(c, c.Param(string(utils.ProjectContextKeys.ProviderCtxKey)))
 		user, err := gothic.CompleteUserAuth(c.Writer, c.Request)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
@@ -83,7 +83,7 @@ func Callback(cfg *utils.ServerConfig, orm *orm.ORM) gin.HandlerFunc {
 // Logout logs out of the auth provider
 func Logout() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Request = addProviderToContext(c, c.Param("provider"))
+		c.Request = addProviderToContext(c, c.Param(string(utils.ProjectContextKeys.ProviderCtxKey)))
 		gothic.Logout(c.Writer, c.Request)
 		c.Writer.Header().Set("Location", "/")
 		c.Writer.WriteHeader(http.StatusTemporaryRedirect)

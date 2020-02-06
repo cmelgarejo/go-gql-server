@@ -12,6 +12,12 @@ import (
 
 // DBUserToGQLUser transforms [user] db input to gql type
 func DBUserToGQLUser(i *dbm.User) (o *gql.User, err error) {
+	profiles := []*gql.UserProfile{}
+	for _, p := range i.UserProfiles {
+		if pp, err := DBUserProfileToGQLUserProfile(&p); err == nil {
+			profiles = append(profiles, pp)
+		}
+	}
 	o = &gql.User{
 		AvatarURL:   i.AvatarURL,
 		ID:          i.ID.String(),
@@ -22,7 +28,26 @@ func DBUserToGQLUser(i *dbm.User) (o *gql.User, err error) {
 		NickName:    i.NickName,
 		Description: i.Description,
 		Location:    i.Location,
+		Profiles:    profiles,
 		CreatedAt:   i.CreatedAt,
+		UpdatedAt:   i.UpdatedAt,
+	}
+	return o, err
+}
+
+// DBUserProfileToGQLUserProfile transforms [user] db input to gql type
+func DBUserProfileToGQLUserProfile(i *dbm.UserProfile) (o *gql.UserProfile, err error) {
+	o = &gql.UserProfile{
+		AvatarURL:   &i.AvatarURL,
+		ID:          i.ID,
+		Email:       i.Email,
+		Name:        &i.Name,
+		FirstName:   &i.FirstName,
+		LastName:    &i.LastName,
+		NickName:    &i.NickName,
+		Description: &i.Description,
+		Location:    &i.Location,
+		CreatedAt:   *i.CreatedAt,
 		UpdatedAt:   i.UpdatedAt,
 	}
 	return o, err

@@ -71,19 +71,18 @@ type ComplexityRoot struct {
 	}
 
 	UserProfile struct {
-		APIkey      func(childComplexity int) int
-		AvatarURL   func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		Description func(childComplexity int) int
-		Email       func(childComplexity int) int
-		FirstName   func(childComplexity int) int
-		ID          func(childComplexity int) int
-		LastName    func(childComplexity int) int
-		Location    func(childComplexity int) int
-		Name        func(childComplexity int) int
-		NickName    func(childComplexity int) int
-		Profiles    func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
+		AvatarURL      func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
+		Description    func(childComplexity int) int
+		Email          func(childComplexity int) int
+		ExternalUserID func(childComplexity int) int
+		FirstName      func(childComplexity int) int
+		ID             func(childComplexity int) int
+		LastName       func(childComplexity int) int
+		Location       func(childComplexity int) int
+		Name           func(childComplexity int) int
+		NickName       func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
 	}
 
 	Users struct {
@@ -255,13 +254,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.UpdatedAt(childComplexity), true
 
-	case "UserProfile.APIkey":
-		if e.complexity.UserProfile.APIkey == nil {
-			break
-		}
-
-		return e.complexity.UserProfile.APIkey(childComplexity), true
-
 	case "UserProfile.avatarURL":
 		if e.complexity.UserProfile.AvatarURL == nil {
 			break
@@ -289,6 +281,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UserProfile.Email(childComplexity), true
+
+	case "UserProfile.externalUserId":
+		if e.complexity.UserProfile.ExternalUserID == nil {
+			break
+		}
+
+		return e.complexity.UserProfile.ExternalUserID(childComplexity), true
 
 	case "UserProfile.firstName":
 		if e.complexity.UserProfile.FirstName == nil {
@@ -331,13 +330,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UserProfile.NickName(childComplexity), true
-
-	case "UserProfile.profiles":
-		if e.complexity.UserProfile.Profiles == nil {
-			break
-		}
-
-		return e.complexity.UserProfile.Profiles(childComplexity), true
 
 	case "UserProfile.updatedAt":
 		if e.complexity.UserProfile.UpdatedAt == nil {
@@ -441,8 +433,9 @@ type User {
 }
 
 type UserProfile {
-  id: ID!
+  id: Int!
   email: String!
+  externalUserId: String
   avatarURL: String
   name: String
   firstName: String
@@ -450,8 +443,6 @@ type UserProfile {
   nickName: String
   description: String
   location: String
-  APIkey: String
-  profiles: [UserProfile]
   createdAt: Time!
   updatedAt: Time
 }
@@ -468,6 +459,10 @@ input UserInput {
   nickName: String
   description: String
   location: String
+  addRoles: [ID]
+  remRoles: [ID]
+  addPermissions: [ID]
+  remPermissions: [ID]
 }
 
 # List Types
@@ -1338,10 +1333,10 @@ func (ec *executionContext) _UserProfile_id(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(int)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UserProfile_email(ctx context.Context, field graphql.CollectedField, obj *models.UserProfile) (ret graphql.Marshaler) {
@@ -1379,6 +1374,40 @@ func (ec *executionContext) _UserProfile_email(ctx context.Context, field graphq
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserProfile_externalUserId(ctx context.Context, field graphql.CollectedField, obj *models.UserProfile) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserProfile",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExternalUserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UserProfile_avatarURL(ctx context.Context, field graphql.CollectedField, obj *models.UserProfile) (ret graphql.Marshaler) {
@@ -1617,74 +1646,6 @@ func (ec *executionContext) _UserProfile_location(ctx context.Context, field gra
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _UserProfile_APIkey(ctx context.Context, field graphql.CollectedField, obj *models.UserProfile) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "UserProfile",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.APIkey, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _UserProfile_profiles(ctx context.Context, field graphql.CollectedField, obj *models.UserProfile) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "UserProfile",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Profiles, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*models.UserProfile)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOUserProfile2ᚕᚖgithubᚗcomᚋcmelgarejoᚋgoᚑgqlᚑserverᚋinternalᚋgqlᚋmodelsᚐUserProfile(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UserProfile_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.UserProfile) (ret graphql.Marshaler) {
@@ -3046,6 +3007,30 @@ func (ec *executionContext) unmarshalInputUserInput(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "addRoles":
+			var err error
+			it.AddRoles, err = ec.unmarshalOID2ᚕᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remRoles":
+			var err error
+			it.RemRoles, err = ec.unmarshalOID2ᚕᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "addPermissions":
+			var err error
+			it.AddPermissions, err = ec.unmarshalOID2ᚕᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remPermissions":
+			var err error
+			it.RemPermissions, err = ec.unmarshalOID2ᚕᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -3220,6 +3205,8 @@ func (ec *executionContext) _UserProfile(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "externalUserId":
+			out.Values[i] = ec._UserProfile_externalUserId(ctx, field, obj)
 		case "avatarURL":
 			out.Values[i] = ec._UserProfile_avatarURL(ctx, field, obj)
 		case "name":
@@ -3234,10 +3221,6 @@ func (ec *executionContext) _UserProfile(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = ec._UserProfile_description(ctx, field, obj)
 		case "location":
 			out.Values[i] = ec._UserProfile_location(ctx, field, obj)
-		case "APIkey":
-			out.Values[i] = ec._UserProfile_APIkey(ctx, field, obj)
-		case "profiles":
-			out.Values[i] = ec._UserProfile_profiles(ctx, field, obj)
 		case "createdAt":
 			out.Values[i] = ec._UserProfile_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -3550,6 +3533,20 @@ func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface
 
 func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	return graphql.UnmarshalInt(v)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3910,6 +3907,38 @@ func (ec *executionContext) unmarshalOID2string(ctx context.Context, v interface
 
 func (ec *executionContext) marshalOID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	return graphql.MarshalID(v)
+}
+
+func (ec *executionContext) unmarshalOID2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*string, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalOID2ᚖstring(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOID2ᚕᚖstring(ctx context.Context, sel ast.SelectionSet, v []*string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalOID2ᚖstring(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

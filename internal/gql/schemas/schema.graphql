@@ -17,8 +17,9 @@ type User {
 }
 
 type UserProfile {
-  id: ID!
+  id: Int!
   email: String!
+  externalUserId: String
   avatarURL: String
   name: String
   firstName: String
@@ -26,8 +27,6 @@ type UserProfile {
   nickName: String
   description: String
   location: String
-  APIkey: String
-  profiles: [UserProfile]
   createdAt: Time!
   updatedAt: Time
 }

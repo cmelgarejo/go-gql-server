@@ -85,7 +85,7 @@ func userList(r *queryResolver, id *string) (*models.Users, error) {
 	whereID := "id = ?"
 	record := &models.Users{}
 	dbRecords := []*dbm.User{}
-	tx := r.ORM.DB.Begin()
+	tx := r.ORM.DB.Begin().Preload(consts.EntityNames.UserProfiles)
 	defer tx.RollbackUnlessCommitted()
 	if id != nil {
 		tx = tx.Where(whereID, *id)

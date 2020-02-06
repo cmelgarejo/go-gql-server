@@ -27,7 +27,7 @@ type User struct {
 	Location            *string
 	AvatarURL           *string       `gorm:"size:1024"`
 	Description         *string       `gorm:"size:1024"`
-	Profiles            []UserProfile `gorm:"association_autocreate:false;association_autoupdate:false"`
+	UserProfiles        []UserProfile `gorm:"association_autocreate:false;association_autoupdate:false"`
 	Roles               []Role        `gorm:"many2many:user_roles;association_autocreate:false;association_autoupdate:false"`
 	Permissions         []Permission  `gorm:"many2many:user_permissions;association_autocreate:false;association_autoupdate:false"`
 }
@@ -85,13 +85,20 @@ func (u *User) BeforeSave(scope *gorm.Scope) error {
 
 // AfterSave hook for User
 func (u *User) AfterSave(scope *gorm.Scope) error {
-	db := scope.DB()
-	if len(u.Permissions) > 0 {
-
-	}
+	db := scope.DB().
+		Preload(consts.EntityNames.Roles).Preload(consts.EntityNames.Permissions).
+		First(u)
+	// Deal with role changes
+	db.Model(u).Association(consts.EntityNames.Permissions).Clear()
 	for _, r := range u.Roles {
-		db.Model(r).Preload(consts.EntityNames.Permissions).First(&r)
-		db.Model(u).Association(consts.EntityNames.Permissions).Replace(r.Permissions)
+		if err := scope.DB().Model(r).Preload(consts.EntityNames.Permissions).First(&r).Error; err != nil {
+			return err
+		}
+		if len(r.Permissions) > 0 {
+			if err := db.Model(u).Association(consts.EntityNames.Permissions).Append(r.Permissions).Error; err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }
