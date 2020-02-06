@@ -14,7 +14,7 @@ var (
 	description = "This is the first user ever!"
 	location    = "His house, maybe?"
 	users       = []*models.User{
-		&models.User{
+		{
 			Email:       "admin@test.com",
 			Name:        &uname,
 			FirstName:   &fname,
@@ -22,9 +22,9 @@ var (
 			NickName:    &nname,
 			Description: &description,
 			Location:    &location,
-			Roles:       []models.Role{models.Role{BaseModelSeq: models.BaseModelSeq{ID: 1}}},
+			Roles:       []models.Role{{BaseModelSeq: models.BaseModelSeq{ID: 1}}},
 		},
-		&models.User{
+		{
 			Email:       "user@test.com",
 			Name:        &uname,
 			FirstName:   &fname,
@@ -32,7 +32,7 @@ var (
 			NickName:    &nname,
 			Description: &description,
 			Location:    &location,
-			Roles:       []models.Role{models.Role{BaseModelSeq: models.BaseModelSeq{ID: 2}}},
+			Roles:       []models.Role{{BaseModelSeq: models.BaseModelSeq{ID: 2}}},
 		},
 	}
 )

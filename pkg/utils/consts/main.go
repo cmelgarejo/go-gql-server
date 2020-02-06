@@ -68,11 +68,11 @@ var (
 
 	// Roles that are part of the systme
 	Roles = []role{
-		role{
+		{
 			Name:        "admin",
 			Description: "Administrator of the app",
 		},
-		role{
+		{
 			Name:        "user",
 			Description: "Normal user of the app",
 		},
