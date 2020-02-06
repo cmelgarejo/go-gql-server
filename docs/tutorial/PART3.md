@@ -684,7 +684,7 @@ couple of packages next.
 
 The included `"log"` package could always be enough for us, but I found this
 well structured package called [Logrus](http://github.com/sirupsen/logrus) and
-created a wrapper for it to be used through out the project, create the file
+created a wrapper for it to be used throughout the project, create the file
 `internal/logger/main.go`:
 
 ```go

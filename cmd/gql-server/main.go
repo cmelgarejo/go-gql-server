@@ -10,6 +10,7 @@ import (
 	"github.com/cmelgarejo/go-gql-server/pkg/utils"
 )
 
+// main
 func main() {
 	var serverconf = &utils.ServerConfig{
 		Host:          utils.MustGet("SERVER_HOST"),
@@ -34,24 +35,24 @@ func main() {
 			AutoMigrate: utils.MustGetBool("GORM_AUTOMIGRATE"),
 		},
 		AuthProviders: []utils.AuthProvider{
-			utils.AuthProvider{
+			{
 				Provider:  "auth0",
 				ClientKey: utils.MustGet("PROVIDER_AUTH0_KEY"),
 				Secret:    utils.MustGet("PROVIDER_AUTH0_SECRET"),
 				Domain:    utils.MustGet("PROVIDER_AUTH0_DOMAIN"),
 				Scopes:    strings.Split(utils.MustGet("PROVIDER_AUTH0_SCOPES"), ","),
 			},
-			utils.AuthProvider{
+			{
 				Provider:  "facebook",
 				ClientKey: utils.MustGet("PROVIDER_FACEBOOK_KEY"),
 				Secret:    utils.MustGet("PROVIDER_FACEBOOK_SECRET"),
 			},
-			utils.AuthProvider{
+			{
 				Provider:  "google",
 				ClientKey: utils.MustGet("PROVIDER_GOOGLE_KEY"),
 				Secret:    utils.MustGet("PROVIDER_GOOGLE_SECRET"),
 			},
-			utils.AuthProvider{
+			{
 				Provider:  "twitter",
 				ClientKey: utils.MustGet("PROVIDER_TWITTER_KEY"),
 				Secret:    utils.MustGet("PROVIDER_TWITTER_SECRET"),

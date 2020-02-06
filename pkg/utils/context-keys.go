@@ -1,6 +1,6 @@
 package utils
 
-// ContextKeys holds the context keys throught the project
+// ContextKeys holds the context keys throughout the project
 type ContextKeys struct {
 	ProviderCtxKey ContextKey // Provider in Auth
 	UserCtxKey     ContextKey // User db object in Auth

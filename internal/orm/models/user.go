@@ -137,7 +137,7 @@ func (k *UserAPIKey) BeforeSave(scope *gorm.Scope) error {
 
 // ## Helper functions
 
-// HasRole verifies if user posseses a role
+// HasRole verifies if user possesses a role
 func (u *User) HasRole(roleID int) (bool, error) {
 	for _, r := range u.Roles {
 		if r.ID == roleID {

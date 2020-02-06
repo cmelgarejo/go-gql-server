@@ -91,7 +91,6 @@ func (o *ORM) FindUserByJWT(email string, provider string, userID string) (*mode
 // UpsertUserProfile saves the user if doesn't exists and adds the OAuth profile
 func (o *ORM) UpsertUserProfile(input *goth.User) (*models.User, error) {
 	db := o.DB.New()
-	u := &models.User{}
 	up := &models.UserProfile{}
 	u, err := transformations.GothUserToDBUser(input, false)
 	if err != nil {
