@@ -59,6 +59,7 @@ var (
 				ID: gUUID, CreatedAt: &now, UpdatedAt: &now,
 			},
 		}, Email: email, Password: password,
+		UserProfiles: []dbm.UserProfile{*userProfile},
 	}
 	dbmUserNoID = &dbm.User{
 		BaseModelSoftDelete: dbm.BaseModelSoftDelete{
@@ -80,7 +81,9 @@ var (
 	}
 	userProfile = &dbm.UserProfile{
 		BaseModelSeq: dbm.BaseModelSeq{
-			ID: 1,
+			ID:        0,
+			CreatedAt: &now,
+			UpdatedAt: &now,
 		},
 		Email:          email,
 		ExternalUserID: gUUID2.String(),
@@ -93,15 +96,33 @@ var (
 		NickName:       emptyStr,
 	}
 	userProfileNoID = func() *dbm.UserProfile {
-		up := *userProfile
+		up := userProfile
 		up.ID = 0
-		return &up
+		up.CreatedAt = nil
+		up.UpdatedAt = nil
+		return up
 	}()
 )
 
 func TestDBUserToGQLUser(t *testing.T) {
 	type args struct {
 		i *dbm.User
+	}
+	profiles := []*gql.UserProfile{
+		{
+			ID:             0,
+			CreatedAt:      now,
+			UpdatedAt:      &now,
+			Email:          email,
+			AvatarURL:      &emptyStr,
+			ExternalUserID: &userID,
+			Name:           &emptyStr,
+			FirstName:      &emptyStr,
+			LastName:       &emptyStr,
+			NickName:       &emptyStr,
+			Description:    &emptyStr,
+			Location:       &emptyStr,
+		},
 	}
 	tests := []struct {
 		name    string
@@ -119,6 +140,7 @@ func TestDBUserToGQLUser(t *testing.T) {
 				Email:     email,
 				CreatedAt: &now,
 				UpdatedAt: &now,
+				Profiles:  profiles,
 			},
 		},
 	}
@@ -130,7 +152,7 @@ func TestDBUserToGQLUser(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(gotO, tt.wantO) {
-				t.Errorf("DBUserToGQLUser() = %v, want %v", gotO, tt.wantO)
+				t.Errorf("DBUserToGQLUser() = \n%#v\n, want \n%#v\n", gotO.Profiles[0], tt.wantO.Profiles[0])
 			}
 		})
 	}
@@ -296,7 +318,7 @@ func TestGothUserToDBUserProfile(t *testing.T) {
 			args: args{
 				update: true,
 				i:      gothUser,
-				ids:    []int{1},
+				ids:    []int{0},
 			},
 			wantO: userProfile,
 		},

@@ -38,17 +38,18 @@ func DBUserToGQLUser(i *dbm.User) (o *gql.User, err error) {
 // DBUserProfileToGQLUserProfile transforms [user] db input to gql type
 func DBUserProfileToGQLUserProfile(i *dbm.UserProfile) (o *gql.UserProfile, err error) {
 	o = &gql.UserProfile{
-		AvatarURL:   &i.AvatarURL,
-		ID:          i.ID,
-		Email:       i.Email,
-		Name:        &i.Name,
-		FirstName:   &i.FirstName,
-		LastName:    &i.LastName,
-		NickName:    &i.NickName,
-		Description: &i.Description,
-		Location:    &i.Location,
-		CreatedAt:   *i.CreatedAt,
-		UpdatedAt:   i.UpdatedAt,
+		AvatarURL:      &i.AvatarURL,
+		ID:             i.ID,
+		ExternalUserID: &i.ExternalUserID,
+		Email:          i.Email,
+		Name:           &i.Name,
+		FirstName:      &i.FirstName,
+		LastName:       &i.LastName,
+		NickName:       &i.NickName,
+		Description:    &i.Description,
+		Location:       &i.Location,
+		CreatedAt:      *i.CreatedAt,
+		UpdatedAt:      i.UpdatedAt,
 	}
 	return o, err
 }
