@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+  dev:
+    command: ./scripts/run-dev.sh
+    build:
+      context: .
+      dockerfile: docker/dev.dockerfile
+    working_dir: /go-gql-server
+    env_file:
+      - .env
+    ports:
+      - 8080:8080
+      - 5002:5002
+    volumes:
+      - .:/go-gql-server
+  dev-linux:
+    network_mode: "host"
+    command: ./scripts/run-dev.sh
+    build:
+      context: .
+      dockerfile: docker/dev.dockerfile
+    working_dir: /go-gql-server
+    env_file:
+      - .env
+    ports:
+      - 8080:8080
+      - 5002:5002
+    volumes:
+      - .:/go-gql-server
+  prod:
+    build:
+      context: .
+      dockerfile: docker/prod.dockerfile
+    env_file:
+      - .env
+    ports:
+      - 8080:8080

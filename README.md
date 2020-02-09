@@ -15,6 +15,28 @@ Opinionated GraphQL server using:
 - [GQLGen](https://gqlgen.com/) for building GraphQL servers without any fuss
   - `go run github.com/99designs/gqlgen init`
 
+## Development with docker
+
+Just run it with `docker-compose`:
+
+`$ docker-compose run dev`
+
+And you'll have your server running with `realize` for your development joy.
+
 ## Deployment
 
 Use docker, swarm or kubernetes, GCP, AWS, DO, you name it.
+
+Running `prod.dockerfile` will build a multistaged build that will give you a slim image containing just the gql-server executable.
+
+### With `docker-compose`
+
+`$ docker-compose build prod`
+
+or
+
+`$ docker-compose run prod`
+
+### Build from the `prod.dockerfile`
+
+`docker build -f docker/prod.dockerfile -t go-gql-server.prod ./`

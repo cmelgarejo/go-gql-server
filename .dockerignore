@@ -1,0 +1,20 @@
+.vscode
+*.md
+.env*
+docs/
+docker-compose*
+docker/
+gqlgen.sh
+*credentials*.json
+.git
+.ipynb_checkpoints
+notebooks
+unused
+Dockerfile
+.DS_Store
+.gitignore
+env.*
+devops
+# To prevent storing dev/temporary container data
+*.csv
+tmp
