@@ -29,7 +29,7 @@ func Begin() gin.HandlerFunc {
 		if gothUser, err := gothic.CompleteUserAuth(c.Writer, c.Request); err != nil {
 			gothic.BeginAuthHandler(c.Writer, c.Request)
 		} else {
-			logger.Infof("user: %#v", gothUser)
+			logger.Debugf("user: %#v", gothUser)
 		}
 	}
 }
@@ -45,15 +45,15 @@ func Callback(cfg *utils.ServerConfig, orm *orm.ORM) gin.HandlerFunc {
 			return
 		}
 		u, err := orm.FindUserByJWT(user.Email, user.Provider, user.UserID)
-		// logger.Infof("gothUser: %#v", user)
+		// logger.Debugf("gothUser: %#v", user)
 		if err != nil {
 			if u, err = orm.UpsertUserProfile(&user); err != nil {
 				logger.Errorf("[Auth.CallBack.UserLoggedIn.UpsertUserProfile.Error]: %v", err)
 				c.AbortWithError(http.StatusInternalServerError, err)
 			}
 		}
-		// logger.Info("[Auth.CallBack.UserLoggedIn.USER]: ", u)
-		logger.Info("[Auth.CallBack.UserLoggedIn]: ", u.ID)
+		// logger.Debug("[Auth.CallBack.UserLoggedIn.USER]: ", u)
+		logger.Debug("[Auth.CallBack.UserLoggedIn]: ", u.ID)
 		jwtToken := jwt.NewWithClaims(jwt.GetSigningMethod(cfg.JWT.Algorithm), Claims{
 			Email: user.Email,
 			StandardClaims: jwt.StandardClaims{
@@ -70,7 +70,7 @@ func Callback(cfg *utils.ServerConfig, orm *orm.ORM) gin.HandlerFunc {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		logger.Info("token: ", token)
+		logger.Debug("token: ", token)
 		json := gin.H{
 			"type":          "Bearer",
 			"token":         token,

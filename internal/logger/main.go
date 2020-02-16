@@ -49,6 +49,16 @@ var (
 
 // Expose some log functions:
 
+// Debug Log
+func Debug(args ...interface{}) {
+	logger.Debugln(args...)
+}
+
+// Debugf Log
+func Debugf(format string, args ...interface{}) {
+	logger.Debugf(format, args...)
+}
+
 // Errorfn Log errors of a [fn] with format
 func Errorfn(fn string, err error) error {
 	outerr := fmt.Errorf("[%s]: %v", fn, err)

@@ -34,6 +34,6 @@ type queryResolver struct{ *Resolver }
 
 func getCurrentUser(ctx context.Context) *dbm.User {
 	cu := ctx.Value(utils.ProjectContextKeys.UserCtxKey).(*dbm.User)
-	logger.Infof("currentUser: %s - %s", cu.Email, cu.ID)
+	logger.Debugf("currentUser: %s - %s", cu.Email, cu.ID)
 	return cu
 }

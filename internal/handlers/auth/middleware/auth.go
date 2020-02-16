@@ -29,7 +29,7 @@ func Middleware(path string, cfg *utils.ServerConfig, orm *orm.ORM) gin.HandlerF
 			}
 			if user != nil {
 				c.Request = addToContext(c, utils.ProjectContextKeys.UserCtxKey, user)
-				logger.Info("User: ", user.ID)
+				logger.Debug("User: ", user.ID)
 			}
 			c.Next()
 		} else {
@@ -58,7 +58,7 @@ func Middleware(path string, cfg *utils.ServerConfig, orm *orm.ORM) gin.HandlerF
 							} else {
 								if user != nil {
 									c.Request = addToContext(c, utils.ProjectContextKeys.UserCtxKey, user)
-									logger.Info("User: ", user.ID)
+									logger.Debug("User: ", user.ID)
 								}
 								c.Next()
 							}
