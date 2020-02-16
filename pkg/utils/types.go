@@ -5,15 +5,17 @@ type ContextKey string
 
 // ServerConfig defines the configuration for the server
 type ServerConfig struct {
-	Host          string
-	Port          string
-	URISchema     string
-	Version       string
-	SessionSecret string
-	JWT           JWTConfig
-	GraphQL       GQLConfig
-	Database      DBConfig
-	AuthProviders []AuthProvider
+	Version        string
+	Env            string
+	Host           string
+	Port           string
+	URISchema      string
+	ServiceVersion string
+	SessionSecret  string
+	JWT            JWTConfig
+	GraphQL        GQLConfig
+	Database       DBConfig
+	AuthProviders  []AuthProvider
 }
 
 //JWTConfig defines the options for JWT tokens
