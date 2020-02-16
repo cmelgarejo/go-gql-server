@@ -49,23 +49,34 @@ type AuthProvider struct {
 	Scopes    []string
 }
 
+func getValidHost(host string) string {
+	if host == ":" {
+		return "localhost"
+	}
+	return host
+}
+
 // ListenEndpoint builds the endpoint string (host + port)
 func (s *ServerConfig) ListenEndpoint() string {
 	if s.Port == "80" {
 		return s.Host
 	}
+	if s.Host == ":" {
+		return s.Host + s.Port
+
+	}
 	return s.Host + ":" + s.Port
 }
 
-// VersionedEndpoint builds the endpoint string (host + port + version)
+// VersionedEndpoint builds the endpoint `string (host + port + version)
 func (s *ServerConfig) VersionedEndpoint(path string) string {
-	return "/" + s.Version + path
+	return "/" + s.ServiceVersion + path
 }
 
 // SchemaVersionedEndpoint builds the schema endpoint string (schema + host + port + version)
 func (s *ServerConfig) SchemaVersionedEndpoint(path string) string {
 	if s.Port == "80" {
-		return s.URISchema + s.Host + "/" + s.Version + path
+		return s.URISchema + getValidHost(s.Host) + "/" + s.ServiceVersion + path
 	}
-	return s.URISchema + s.Host + ":" + s.Port + "/" + s.Version + path
+	return s.URISchema + getValidHost(s.Host) + ":" + s.Port + "/" + s.ServiceVersion + path
 }
