@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     ports:
-      - 8080:8080
+      - 7777:7777
       - 5002:5002
     volumes:
       - .:/go-gql-server
@@ -23,7 +23,7 @@ services:
     env_file:
       - .env
     ports:
-      - 8080:8080
+      - 7777:7777
       - 5002:5002
     volumes:
       - .:/go-gql-server
@@ -34,4 +34,4 @@ services:
     env_file:
       - .env
     ports:
-      - 8080:8080
+      - 80:80
