@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 
+	"github.com/cmelgarejo/go-gql-server/internal/orm"
+	"github.com/cmelgarejo/go-gql-server/pkg/utils"
+
 	"github.com/cmelgarejo/go-gql-server/pkg/utils/consts"
 
 	"github.com/cmelgarejo/go-gql-server/internal/logger"
@@ -19,7 +22,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input models.UserInpu
 	if ok, err := cu.HasPermission(consts.Permissions.Create, consts.EntityNames.Users); !ok || err != nil {
 		return nil, logger.Errorfn(consts.EntityNames.Users, err)
 	}
-	return userCreateUpdate(r, input, false)
+	return userCreateUpdate(r, input, false, cu)
 }
 
 // UpdateUser updates a record
@@ -28,7 +31,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input mode
 	if ok, err := cu.HasPermission(consts.Permissions.Create, consts.EntityNames.Users); !ok || err != nil {
 		return nil, logger.Errorfn(consts.EntityNames.Users, err)
 	}
-	return userCreateUpdate(r, input, true, id)
+	return userCreateUpdate(r, input, true, cu, id)
 }
 
 // DeleteUser deletes a record
@@ -41,18 +44,18 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, err
 }
 
 // Users lists records
-func (r *queryResolver) Users(ctx context.Context, id *string) (*models.Users, error) {
+func (r *queryResolver) Users(ctx context.Context, id *string, filters []*models.QueryFilter, limit *int, offset *int, orderBy *string, sortDirection *string) (*models.Users, error) {
 	cu := getCurrentUser(ctx)
 	if ok, err := cu.HasPermission(consts.Permissions.List, consts.EntityNames.Users); !ok || err != nil {
 		return nil, logger.Errorfn(consts.EntityNames.Users, err)
 	}
-	return userList(r, id)
+	return userList(r, id, filters, limit, offset, orderBy, sortDirection)
 }
 
 // ## Helper functions
 
-func userCreateUpdate(r *mutationResolver, input models.UserInput, update bool, ids ...string) (*models.User, error) {
-	dbo, err := tf.GQLInputUserToDBUser(&input, update, ids...)
+func userCreateUpdate(r *mutationResolver, input models.UserInput, update bool, cu *dbm.User, ids ...string) (*models.User, error) {
+	dbo, err := tf.GQLInputUserToDBUser(&input, update, cu, ids...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,36 +70,34 @@ func userCreateUpdate(r *mutationResolver, input models.UserInput, update bool, 
 	} else {
 		tx = tx.Model(&dbo).Update(dbo).First(dbo) // Or update it
 	}
-	gql, err := tf.DBUserToGQLUser(dbo)
-	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
 	tx = tx.Commit()
-	return gql, tx.Error
+	return tf.DBUserToGQLUser(dbo), tx.Error
 }
 
 func userDelete(r *mutationResolver, id string) (bool, error) {
 	return false, errors.New("not implemented")
 }
 
-func userList(r *queryResolver, id *string) (*models.Users, error) {
-	entity := consts.GetTableName(consts.EntityNames.Users)
+func userList(r *queryResolver, id *string, filters []*models.QueryFilter, limit *int, offset *int, orderBy *string, sortDirection *string) (*models.Users, error) {
 	whereID := "id = ?"
 	record := &models.Users{}
 	dbRecords := []*dbm.User{}
-	tx := r.ORM.DB.Begin().Preload(consts.EntityNames.UserProfiles)
-	defer tx.RollbackUnlessCommitted()
+	tx := r.ORM.DB.Begin().
+		Offset(*offset).Limit(*limit).Order(utils.ToSnakeCase(*orderBy) + " " + *sortDirection).
+		Preload(consts.EntityNames.UserProfiles)
 	if id != nil {
 		tx = tx.Where(whereID, *id)
 	}
+	if filters != nil {
+		if filtered, err := orm.ParseFilters(tx, filters); err == nil {
+			tx = filtered
+		} else {
+			return nil, err
+		}
+	}
 	tx = tx.Find(&dbRecords).Count(&record.Count)
 	for _, dbRec := range dbRecords {
-		if rec, err := tf.DBUserToGQLUser(dbRec); err != nil {
-			logger.Errorfn(entity, err)
-		} else {
-			record.List = append(record.List, rec)
-		}
+		record.List = append(record.List, tf.DBUserToGQLUser(dbRec))
 	}
 	return record, tx.Error
 }

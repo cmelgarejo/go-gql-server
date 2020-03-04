@@ -26,6 +26,7 @@ type JWTConfig struct {
 
 // GQLConfig defines the configuration for the GQL Server
 type GQLConfig struct {
+	ComplexityLimit     int
 	Path                string
 	PlaygroundPath      string
 	IsPlaygroundEnabled bool

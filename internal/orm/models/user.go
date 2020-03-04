@@ -30,6 +30,8 @@ type User struct {
 	UserProfiles        []UserProfile `gorm:"association_autocreate:false;association_autoupdate:false"`
 	Roles               []Role        `gorm:"many2many:user_roles;association_autocreate:false;association_autoupdate:false"`
 	Permissions         []Permission  `gorm:"many2many:user_permissions;association_autocreate:false;association_autoupdate:false"`
+	CreatedBy           *User         `gorm:"association_autoupdate:false;association_autocreate:false"`
+	UpdatedBy           *User         `gorm:"association_autoupdate:false;association_autocreate:false"`
 }
 
 // UserProfile saves all the related OAuth Profiles
@@ -47,6 +49,8 @@ type UserProfile struct {
 	Location       string `gorm:"size:512"`
 	AvatarURL      string `gorm:"size:1024"`
 	Description    string `gorm:"size:1024"`
+	CreatedBy      *User  `gorm:"association_autoupdate:false;association_autocreate:false"`
+	UpdatedBy      *User  `gorm:"association_autoupdate:false;association_autocreate:false"`
 }
 
 // UserAPIKey generated api keys for the users

@@ -25,6 +25,7 @@ func main() {
 			Algorithm: utils.MustGet("AUTH_JWT_SIGNING_ALGORITHM"),
 		},
 		GraphQL: utils.GQLConfig{
+			ComplexityLimit:     utils.MustGetInt32("GQL_SERVER_GRAPHQL_COMPLEXITY_LIMIT"),
 			Path:                utils.MustGet("GQL_SERVER_GRAPHQL_PATH"),
 			PlaygroundPath:      utils.MustGet("GQL_SERVER_GRAPHQL_PLAYGROUND_PATH"),
 			IsPlaygroundEnabled: utils.MustGetBool("GQL_SERVER_GRAPHQL_PLAYGROUND_ENABLED"),

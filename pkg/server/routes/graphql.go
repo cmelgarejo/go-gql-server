@@ -17,7 +17,7 @@ func GraphQL(cfg *utils.ServerConfig, r *gin.Engine, orm *orm.ORM) error {
 	g := r.Group(gqlPath)
 
 	// GraphQL handler
-	g.POST("", auth.Middleware(g.BasePath(), cfg, orm), handlers.GraphqlHandler(orm))
+	g.POST("", auth.Middleware(g.BasePath(), cfg, orm), handlers.GraphqlHandler(orm, &cfg.GraphQL))
 	logger.Info("GraphQL @ ", gqlPath)
 	// Playground handler
 	if cfg.GraphQL.IsPlaygroundEnabled {

@@ -3,8 +3,19 @@
 package models
 
 import (
+	"fmt"
+	"io"
+	"strconv"
 	"time"
 )
+
+type QueryFilter struct {
+	Field         string             `json:"field"`
+	LinkOperation *LinkOperationType `json:"linkOperation"`
+	Op            OperationType      `json:"op"`
+	Value         *interface{}       `json:"value"`
+	Values        []interface{}      `json:"values"`
+}
 
 type User struct {
 	ID          string         `json:"id"`
@@ -18,6 +29,8 @@ type User struct {
 	Location    *string        `json:"location"`
 	APIkey      *string        `json:"APIkey"`
 	Profiles    []*UserProfile `json:"profiles"`
+	CreatedBy   *User          `json:"createdBy"`
+	UpdatedBy   *User          `json:"updatedBy"`
 	CreatedAt   *time.Time     `json:"createdAt"`
 	UpdatedAt   *time.Time     `json:"updatedAt"`
 }
@@ -52,9 +65,121 @@ type UserProfile struct {
 	Location       *string    `json:"location"`
 	CreatedAt      time.Time  `json:"createdAt"`
 	UpdatedAt      *time.Time `json:"updatedAt"`
+	CreatedBy      *User      `json:"createdBy"`
+	UpdatedBy      *User      `json:"updatedBy"`
 }
 
 type Users struct {
 	Count *int    `json:"count"`
 	List  []*User `json:"list"`
+}
+
+type LinkOperationType string
+
+const (
+	LinkOperationTypeAnd LinkOperationType = "AND"
+	LinkOperationTypeOr  LinkOperationType = "OR"
+)
+
+var AllLinkOperationType = []LinkOperationType{
+	LinkOperationTypeAnd,
+	LinkOperationTypeOr,
+}
+
+func (e LinkOperationType) IsValid() bool {
+	switch e {
+	case LinkOperationTypeAnd, LinkOperationTypeOr:
+		return true
+	}
+	return false
+}
+
+func (e LinkOperationType) String() string {
+	return string(e)
+}
+
+func (e *LinkOperationType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = LinkOperationType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid LinkOperationType", str)
+	}
+	return nil
+}
+
+func (e LinkOperationType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type OperationType string
+
+const (
+	OperationTypeEquals           OperationType = "Equals"
+	OperationTypeNotEquals        OperationType = "NotEquals"
+	OperationTypeLessThan         OperationType = "LessThan"
+	OperationTypeLessThanEqual    OperationType = "LessThanEqual"
+	OperationTypeGreaterThan      OperationType = "GreaterThan"
+	OperationTypeGreaterThanEqual OperationType = "GreaterThanEqual"
+	OperationTypeIs               OperationType = "Is"
+	OperationTypeIsNull           OperationType = "IsNull"
+	OperationTypeIsNotNull        OperationType = "IsNotNull"
+	OperationTypeIn               OperationType = "In"
+	OperationTypeNotIn            OperationType = "NotIn"
+	OperationTypeLike             OperationType = "Like"
+	OperationTypeILike            OperationType = "ILike"
+	OperationTypeNotLike          OperationType = "NotLike"
+	OperationTypeBetween          OperationType = "Between"
+	OperationTypeMatch            OperationType = "Match"
+)
+
+var AllOperationType = []OperationType{
+	OperationTypeEquals,
+	OperationTypeNotEquals,
+	OperationTypeLessThan,
+	OperationTypeLessThanEqual,
+	OperationTypeGreaterThan,
+	OperationTypeGreaterThanEqual,
+	OperationTypeIs,
+	OperationTypeIsNull,
+	OperationTypeIsNotNull,
+	OperationTypeIn,
+	OperationTypeNotIn,
+	OperationTypeLike,
+	OperationTypeILike,
+	OperationTypeNotLike,
+	OperationTypeBetween,
+	OperationTypeMatch,
+}
+
+func (e OperationType) IsValid() bool {
+	switch e {
+	case OperationTypeEquals, OperationTypeNotEquals, OperationTypeLessThan, OperationTypeLessThanEqual, OperationTypeGreaterThan, OperationTypeGreaterThanEqual, OperationTypeIs, OperationTypeIsNull, OperationTypeIsNotNull, OperationTypeIn, OperationTypeNotIn, OperationTypeLike, OperationTypeILike, OperationTypeNotLike, OperationTypeBetween, OperationTypeMatch:
+		return true
+	}
+	return false
+}
+
+func (e OperationType) String() string {
+	return string(e)
+}
+
+func (e *OperationType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = OperationType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid OperationType", str)
+	}
+	return nil
+}
+
+func (e OperationType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

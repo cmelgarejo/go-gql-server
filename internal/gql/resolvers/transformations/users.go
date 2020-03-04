@@ -11,14 +11,15 @@ import (
 )
 
 // DBUserToGQLUser transforms [user] db input to gql type
-func DBUserToGQLUser(i *dbm.User) (o *gql.User, err error) {
+func DBUserToGQLUser(i *dbm.User) *gql.User {
+	if i == nil {
+		return nil
+	}
 	profiles := []*gql.UserProfile{}
 	for _, p := range i.UserProfiles {
-		if pp, err := DBUserProfileToGQLUserProfile(&p); err == nil {
-			profiles = append(profiles, pp)
-		}
+		profiles = append(profiles, DBUserProfileToGQLUserProfile(&p))
 	}
-	o = &gql.User{
+	return &gql.User{
 		AvatarURL:   i.AvatarURL,
 		ID:          i.ID.String(),
 		Email:       i.Email,
@@ -32,12 +33,14 @@ func DBUserToGQLUser(i *dbm.User) (o *gql.User, err error) {
 		CreatedAt:   i.CreatedAt,
 		UpdatedAt:   i.UpdatedAt,
 	}
-	return o, err
 }
 
 // DBUserProfileToGQLUserProfile transforms [user] db input to gql type
-func DBUserProfileToGQLUserProfile(i *dbm.UserProfile) (o *gql.UserProfile, err error) {
-	o = &gql.UserProfile{
+func DBUserProfileToGQLUserProfile(i *dbm.UserProfile) *gql.UserProfile {
+	if i == nil {
+		return nil
+	}
+	return &gql.UserProfile{
 		AvatarURL:      &i.AvatarURL,
 		ID:             i.ID,
 		ExternalUserID: &i.ExternalUserID,
@@ -50,12 +53,19 @@ func DBUserProfileToGQLUserProfile(i *dbm.UserProfile) (o *gql.UserProfile, err 
 		Location:       &i.Location,
 		CreatedAt:      *i.CreatedAt,
 		UpdatedAt:      i.UpdatedAt,
+		CreatedBy:      DBUserToGQLUser(i.CreatedBy),
+		UpdatedBy:      DBUserToGQLUser(i.UpdatedBy),
 	}
-	return o, err
 }
 
 // GQLInputUserToDBUser transforms [user] gql input to db model
-func GQLInputUserToDBUser(i *gql.UserInput, update bool, ids ...string) (o *dbm.User, err error) {
+func GQLInputUserToDBUser(i *gql.UserInput, update bool, u *dbm.User, ids ...string) (o *dbm.User, err error) {
+	if i.Email == nil && !update {
+		return nil, errors.New("field [email] is required")
+	}
+	if i.Password == nil && !update {
+		return nil, errors.New("field [password] is required")
+	}
 	o = &dbm.User{
 		Name:        i.Name,
 		FirstName:   i.FirstName,
@@ -64,18 +74,16 @@ func GQLInputUserToDBUser(i *gql.UserInput, update bool, ids ...string) (o *dbm.
 		Description: i.Description,
 		Location:    i.Location,
 	}
-	if i.Email == nil && !update {
-		return nil, errors.New("field [email] is required")
-	}
-	if i.Password == nil && !update {
-		return nil, errors.New("field [password] is required")
-	}
 	if i.Email != nil {
 		o.Email = *i.Email
 	}
 	if i.Password != nil {
 		o.Password = *i.Password
 	}
+	if !update {
+		o.CreatedBy = u
+	}
+	o.UpdatedBy = u
 	if len(ids) > 0 {
 		updID, err := uuid.FromString(ids[0])
 		if err != nil {
