@@ -13,7 +13,7 @@ type QueryFilter struct {
 	Field         string             `json:"field"`
 	LinkOperation *LinkOperationType `json:"linkOperation"`
 	Op            OperationType      `json:"op"`
-	Value         *interface{}       `json:"value"`
+	Value         interface{}        `json:"value"`
 	Values        []interface{}      `json:"values"`
 }
 

@@ -1,7 +1,14 @@
 package handlers
 
 import (
-	"github.com/99designs/gqlgen/handler"
+	"time"
+
+	"github.com/99designs/gqlgen/graphql/handler"
+
+	"github.com/99designs/gqlgen/graphql/handler/apollotracing"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/cmelgarejo/go-gql-server/internal/gql"
 	"github.com/cmelgarejo/go-gql-server/internal/gql/resolvers"
 	"github.com/cmelgarejo/go-gql-server/internal/orm"
@@ -16,21 +23,37 @@ func GraphqlHandler(orm *orm.ORM, gqlConfig *utils.GQLConfig) gin.HandlerFunc {
 		Resolvers: &resolvers.Resolver{
 			ORM: orm, // pass in the ORM instance in the resolvers to be used
 		},
+		Directives: gql.DirectiveRoot{},
+		Complexity: gql.ComplexityRoot{},
 	}
 
-	setProjectComplexity(&c)
-	h := handler.GraphQL(gql.NewExecutableSchema(c), handler.ComplexityLimit(gqlConfig.ComplexityLimit))
+	// setProjectComplexity(&c)
+	// h := handler.GraphQL(gql.NewExecutableSchema(c), handler.ComplexityLimit(gqlConfig.ComplexityLimit))
+
+	srv := handler.New(gql.NewExecutableSchema(c))
+	srv.AddTransport(transport.Websocket{
+		KeepAlivePingInterval: 10 * time.Second,
+	})
+	srv.AddTransport(transport.Options{})
+	srv.AddTransport(transport.GET{})
+	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.MultipartForm{})
+	srv.Use(extension.FixedComplexityLimit(gqlConfig.ComplexityLimit))
+	if gqlConfig.IsIntrospectionEnabled {
+		srv.Use(extension.Introspection{})
+	}
+	srv.Use(apollotracing.Tracer{})
 
 	return func(c *gin.Context) {
-		h.ServeHTTP(c.Writer, c.Request)
+		// h.ServeHTTP(c.Writer, c.Request)
+		srv.ServeHTTP(c.Writer, c.Request)
 	}
 }
 
 // PlaygroundHandler defines a handler to expose the Playground
 func PlaygroundHandler(path string) gin.HandlerFunc {
-	h := handler.Playground("Go GraphQL Server", path)
 	return func(c *gin.Context) {
-		h.ServeHTTP(c.Writer, c.Request)
+		playground.Handler("Go GraphQL Server", path).ServeHTTP(c.Writer, c.Request)
 	}
 }
 
