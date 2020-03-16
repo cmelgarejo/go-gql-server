@@ -12,6 +12,7 @@ type ServerConfig struct {
 	URISchema      string
 	ServiceVersion string
 	SessionSecret  string
+	Frontend       FrontendConfig
 	JWT            JWTConfig
 	GraphQL        GQLConfig
 	Database       DBConfig
@@ -49,6 +50,11 @@ type AuthProvider struct {
 	Secret    string
 	Domain    string // If needed, like with auth0
 	Scopes    []string
+}
+
+//FrontendConfig defines the options for the Frontend
+type FrontendConfig struct {
+	LoginCallbackURL string
 }
 
 func getValidHost(host string) string {

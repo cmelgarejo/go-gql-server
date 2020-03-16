@@ -3,6 +3,8 @@ package handlers
 import (
 	"time"
 
+	"github.com/99designs/gqlgen/graphql/handler/lru"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 
 	"github.com/99designs/gqlgen/graphql/handler/apollotracing"
@@ -43,7 +45,9 @@ func GraphqlHandler(orm *orm.ORM, gqlConfig *utils.GQLConfig) gin.HandlerFunc {
 		srv.Use(extension.Introspection{})
 	}
 	srv.Use(apollotracing.Tracer{})
-
+	srv.Use(extension.AutomaticPersistedQuery{
+		Cache: lru.New(100),
+	})
 	return func(c *gin.Context) {
 		// h.ServeHTTP(c.Writer, c.Request)
 		srv.ServeHTTP(c.Writer, c.Request)
