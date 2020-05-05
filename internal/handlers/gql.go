@@ -62,16 +62,16 @@ func PlaygroundHandler(path string) gin.HandlerFunc {
 }
 
 func setProjectComplexity(c *gql.Config) {
-	countComplexity := func(childComplexity int, limit *int, offset *int) int {
-		return *limit
-	}
-	fixedComplexity := func(childComplexity int) int {
-		return 100
-	}
+	// countComplexity := func(childComplexity int, limit *int, offset *int) int {
+	// 	return *limit
+	// }
+	// fixedComplexity := func(childComplexity int) int {
+	// 	return 100
+	// }
 	// c.Complexity.Query.Users = func(childComplexity int, id *string, filters []*models.QueryFilter, limit *int, offset *int, orderBy *string, sortDirection *string) int {
 	// 	return *limit
 	// }
-	c.Complexity.User.CreatedBy = fixedComplexity
-	c.Complexity.User.UpdatedBy = fixedComplexity
-	c.Complexity.User.Profiles = countComplexity
+	// c.Complexity.User.CreatedBy = fixedComplexity
+	// c.Complexity.User.UpdatedBy = fixedComplexity
+	// c.Complexity.User.Profiles = countComplexity
 }

@@ -11,28 +11,28 @@ import (
 )
 
 // DBUserToGQLUser transforms [user] db input to gql type
-func DBUserToGQLUser(i *dbm.User) *gql.User {
+func DBUserToGQLUser(i *dbm.User) (*gql.User, error) {
 	if i == nil {
-		return nil
+		return nil, nil
 	}
 	profiles := []*gql.UserProfile{}
 	for _, p := range i.UserProfiles {
 		profiles = append(profiles, DBUserProfileToGQLUserProfile(&p))
 	}
 	return &gql.User{
-		AvatarURL:   i.AvatarURL,
-		ID:          i.ID.String(),
-		Email:       i.Email,
-		Name:        i.Name,
-		FirstName:   i.FirstName,
-		LastName:    i.LastName,
-		NickName:    i.NickName,
-		Description: i.Description,
-		Location:    i.Location,
-		Profiles:    profiles,
-		CreatedAt:   i.CreatedAt,
-		UpdatedAt:   i.UpdatedAt,
-	}
+		// AvatarURL:   i.AvatarURL,
+		// ID:          i.ID.String(),
+		Email: i.Email,
+		Name:  i.Name,
+		// FirstName:   i.FirstName,
+		// LastName:    i.LastName,
+		// NickName:    i.NickName,
+		// Description: i.Description,
+		// Location:    i.Location,
+		// Profiles:    profiles,
+		// CreatedAt:   i.CreatedAt,
+		// UpdatedAt:   i.UpdatedAt,
+	}, nil
 }
 
 // DBUserProfileToGQLUserProfile transforms [user] db input to gql type
@@ -53,8 +53,8 @@ func DBUserProfileToGQLUserProfile(i *dbm.UserProfile) *gql.UserProfile {
 		Location:       &i.Location,
 		CreatedAt:      *i.CreatedAt,
 		UpdatedAt:      i.UpdatedAt,
-		CreatedBy:      DBUserToGQLUser(i.CreatedBy),
-		UpdatedBy:      DBUserToGQLUser(i.UpdatedBy),
+		// CreatedBy:      DBUserToGQLUser(i.CreatedBy),
+		// UpdatedBy:      DBUserToGQLUser(i.UpdatedBy),
 	}
 }
 

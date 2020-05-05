@@ -2,7 +2,6 @@ package routes
 
 import (
 	"github.com/cmelgarejo/go-gql-server/internal/handlers"
-	auth "github.com/cmelgarejo/go-gql-server/internal/handlers/auth/middleware"
 	"github.com/cmelgarejo/go-gql-server/internal/logger"
 	"github.com/cmelgarejo/go-gql-server/internal/orm"
 	"github.com/cmelgarejo/go-gql-server/pkg/utils"
@@ -17,7 +16,7 @@ func GraphQL(cfg *utils.ServerConfig, r *gin.Engine, orm *orm.ORM) error {
 	g := r.Group(gqlPath)
 
 	// GraphQL handler
-	g.POST("", auth.Middleware(g.BasePath(), cfg, orm), handlers.GraphqlHandler(orm, &cfg.GraphQL))
+	g.POST("", handlers.GraphqlHandler(orm, &cfg.GraphQL))
 	logger.Info("GraphQL @ ", gqlPath)
 	// Playground handler
 	if cfg.GraphQL.IsPlaygroundEnabled {

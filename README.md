@@ -1,5 +1,7 @@
 # Go-GQL-Server
 
+This graphql server branch proxies [JSONPlaceholder](https://jsonplaceholder.typicode.com/) as a proof of concept.
+
 [![Go Report Card](https://goreportcard.com/badge/github.com/cmelgarejo/go-gql-server)](https://goreportcard.com/report/github.com/cmelgarejo/go-gql-server)
 
 Opinionated GraphQL server using:

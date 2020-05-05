@@ -10,9 +10,9 @@ import (
 // RegisterRoutes register the routes for the server
 func RegisterRoutes(cfg *utils.ServerConfig, r *gin.Engine, orm *orm.ORM) (err error) {
 	// Auth routes
-	if err = routes.Auth(cfg, r, orm); err != nil {
-		return err
-	}
+	// if err = routes.Auth(cfg, r, orm); err != nil {
+	// 	return err
+	// }
 	// GraphQL server routes
 	if err = routes.GraphQL(cfg, r, orm); err != nil {
 		return err

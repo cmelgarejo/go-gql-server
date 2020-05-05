@@ -30,21 +30,18 @@ enum OperationType {
 
 # Types
 type User {
-  id: ID!
-  email: String!
-  avatarURL: String
+  id: Int!
   name: String
-  firstName: String
-  lastName: String
-  nickName: String
-  description: String
-  location: String
-  APIkey: String
-  profiles(limit: Int = 10, offset: Int = 0): [UserProfile!]!
-  createdBy: User
-  updatedBy: User
-  createdAt: Time
-  updatedAt: Time
+  username: String
+  email: String!
+  posts: [Post]!
+}
+
+type Post {
+  id: Int!
+  userId: Int!
+  title: String
+  body: String
 }
 
 type UserProfile {
@@ -113,5 +110,5 @@ type Query {
     offset: Int = 0
     orderBy: String = "id"
     sortDirection: String = "ASC"
-  ): Users!
+  ): [User!]
 }

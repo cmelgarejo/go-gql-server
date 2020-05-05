@@ -9,6 +9,13 @@ import (
 	"time"
 )
 
+type Post struct {
+	ID     int     `json:"id"`
+	UserID int     `json:"userId"`
+	Title  *string `json:"title"`
+	Body   *string `json:"body"`
+}
+
 type QueryFilter struct {
 	Field         string             `json:"field"`
 	LinkOperation *LinkOperationType `json:"linkOperation"`
@@ -18,21 +25,11 @@ type QueryFilter struct {
 }
 
 type User struct {
-	ID          string         `json:"id"`
-	Email       string         `json:"email"`
-	AvatarURL   *string        `json:"avatarURL"`
-	Name        *string        `json:"name"`
-	FirstName   *string        `json:"firstName"`
-	LastName    *string        `json:"lastName"`
-	NickName    *string        `json:"nickName"`
-	Description *string        `json:"description"`
-	Location    *string        `json:"location"`
-	APIkey      *string        `json:"APIkey"`
-	Profiles    []*UserProfile `json:"profiles"`
-	CreatedBy   *User          `json:"createdBy"`
-	UpdatedBy   *User          `json:"updatedBy"`
-	CreatedAt   *time.Time     `json:"createdAt"`
-	UpdatedAt   *time.Time     `json:"updatedAt"`
+	ID       int     `json:"id"`
+	Name     *string `json:"name"`
+	Username *string `json:"username"`
+	Email    string  `json:"email"`
+	Posts    []*Post `json:"posts"`
 }
 
 type UserInput struct {
