@@ -3,14 +3,13 @@ package handlers
 import (
 	"time"
 
-	"github.com/99designs/gqlgen/graphql/handler/lru"
-
 	"github.com/99designs/gqlgen/graphql/handler"
-
 	"github.com/99designs/gqlgen/graphql/handler/apollotracing"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+
 	"github.com/cmelgarejo/go-gql-server/internal/gql"
 	"github.com/cmelgarejo/go-gql-server/internal/gql/resolvers"
 	"github.com/cmelgarejo/go-gql-server/internal/orm"
@@ -57,7 +56,7 @@ func GraphqlHandler(orm *orm.ORM, gqlConfig *utils.GQLConfig) gin.HandlerFunc {
 // PlaygroundHandler defines a handler to expose the Playground
 func PlaygroundHandler(path string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		playground.Handler("Go GraphQL Server", path).ServeHTTP(c.Writer, c.Request)
+		playground.Handler("GraphQL-Server", path).ServeHTTP(c.Writer, c.Request)
 	}
 }
 

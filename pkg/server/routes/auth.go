@@ -14,6 +14,6 @@ func Auth(cfg *utils.ServerConfig, r *gin.Engine, orm *orm.ORM) error {
 	g := r.Group(cfg.VersionedEndpoint("/auth"))
 	g.GET("/:"+provider, auth.Begin())
 	g.GET("/:"+provider+"/callback", auth.Callback(cfg, orm))
-	// g.GET(:"+provider+"/refresh", auth.Refresh(cfg, orm))
+	// g.GET("/:"+provider+"/refresh", auth.Refresh(cfg, orm))
 	return nil
 }

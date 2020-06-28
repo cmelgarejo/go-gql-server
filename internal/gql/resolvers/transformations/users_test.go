@@ -125,10 +125,9 @@ func TestDBUserToGQLUser(t *testing.T) {
 		},
 	}
 	tests := []struct {
-		name    string
-		args    args
-		wantO   *gql.User
-		wantErr bool
+		name  string
+		args  args
+		wantO *gql.User
 	}{
 		{
 			name: "DBUser OK",
@@ -146,11 +145,7 @@ func TestDBUserToGQLUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotO, err := DBUserToGQLUser(tt.args.i)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("DBUserToGQLUser() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			gotO := DBUserToGQLUser(tt.args.i)
 			if !reflect.DeepEqual(gotO, tt.wantO) {
 				t.Errorf("DBUserToGQLUser() = \n%#v\n, want \n%#v\n", gotO.Profiles[0], tt.wantO.Profiles[0])
 			}
@@ -224,7 +219,7 @@ func TestGQLInputUserToDBUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotO, err := GQLInputUserToDBUser(tt.args.i, tt.args.update, tt.args.ids...)
+			gotO, err := GQLInputUserToDBUser(tt.args.i, tt.args.update, dbmUser, tt.args.ids...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GQLInputUserToDBUser() error = %v, wantErr %v", err, tt.wantErr)
 				return
