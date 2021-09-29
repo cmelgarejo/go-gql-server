@@ -4,8 +4,8 @@ go 1.14
 
 require (
 	github.com/99designs/gqlgen v0.11.3
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/gin-gonic/gin v1.6.3
+	github.com/dgrijalva/jwt-go v3.2.1
+	github.com/gin-gonic/gin v1.7.0
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/jinzhu/gorm v1.9.14
 	github.com/markbates/goth v1.64.2
